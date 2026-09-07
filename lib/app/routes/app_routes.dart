@@ -17,6 +17,8 @@ abstract class Routes {
   static const EXHIBITOR_MAIN = '/exhibitor_main';
   static const LEAD_PIPELINE = '/lead_pipeline';
   static const LEAD_DETAILS = '/lead_details';
+  static const MY_PROFILE = '/my_profile';
+  static const SETTINGS = '/settings';
 
   // Visitor Routes
   static const VISITOR_MAIN = '/visitor_main';

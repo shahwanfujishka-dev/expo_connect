@@ -9,8 +9,23 @@ class Endpoints {
   static const String login = "/api/auth/login";
   static const String logout = "/api/auth/logout";
   
+  // Profile
+  static const String myProfile = "/api/my-profile";
+  static const String myQrCode = "/api/my-profile/my-qr-code";
+  static const String changePassword = "/api/my-profile/change-password";
+  static const String updateAvatar = "/api/my-profile/update-profile-picture";
+  static const String removeAvatar = "/api/my-profile/remove-profile-picture";
+  
   // Lead Capture
   static const String manualLeadCapture = "/api/lead-capture/manual";
+  static const String scanQrCode = "/api/lead-capture/scan-qrcode";
+  
+  // Dashboard
+  static const String dashboard = "/api/dashboard";
+
+  // Leads
+  static const String leads = "/api/lead";
+  static const String leadShow = "/api/lead/show"; // Needs ID suffix
   
   // Connect timeout
   static const int connectionTimeout = 30000;

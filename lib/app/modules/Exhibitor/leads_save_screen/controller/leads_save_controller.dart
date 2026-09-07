@@ -27,7 +27,7 @@ class LeadSavedController extends GetxController {
     doneTapped();
   }
 
-  void doneTapped() => Get.offAllNamed(Routes.DASHBOARD);
+  void doneTapped() => Get.offAllNamed(Routes.EXHIBITOR_MAIN);
 
   @override
   void onClose() {

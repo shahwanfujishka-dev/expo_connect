@@ -14,7 +14,7 @@ const exhibitorNavItems = [
   ExhibitorNavItem(Icons.people_alt_rounded, 'Leads'),
   ExhibitorNavItem(Icons.qr_code_scanner_rounded, 'Scan'),
   ExhibitorNavItem(Icons.event, 'Events'),
-  ExhibitorNavItem(Icons.bar_chart_rounded, 'Reports'),
+  ExhibitorNavItem(Icons.person_outline_rounded, 'Profile'),
 ];
 
 class ExhibitorBottomNav extends StatelessWidget {

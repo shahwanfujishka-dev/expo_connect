@@ -28,6 +28,7 @@ dependencies:
   country_picker: ^2.0.24
   flutter_animate: ^4.5.0
   get_storage: ^2.1.1
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

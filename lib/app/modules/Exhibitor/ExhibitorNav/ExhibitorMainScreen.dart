@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/app_colors.dart';
 import '../dashboard/Dashboard_Screen.dart';
-import '../exhibitor_profile/exhibitor_profile_screen.dart';
+import '../exhibitor_profile/my_profile_screen.dart';
 import '../leads_screen/lead_pipeline/lead_pipeline_screen.dart';
 import 'ExhibitorBottomNav.dart';
 import 'ExhibitorNavController.dart';
@@ -22,14 +22,14 @@ class ExhibitorMainScreen extends GetView<ExhibitorNavController> {
               children: [
                 const DashboardScreen(),
                 const LeadPipelineScreen(),
-                const SizedBox.shrink(), // Placeholder for Scan (opens modal)
+                const SizedBox.shrink(), // Placeholder for Scan
                 Center(
                   child: Text(
-                    'Analytics (Coming Soon)',
+                    'Events (Coming Soon)',
                     style: AppTextStyles.body,
                   ),
                 ),
-                const ExhibitorProfileScreen(),
+                const MyProfileScreen(),
               ],
             ),
             bottomNavigationBar: ExhibitorBottomNav(
@@ -40,7 +40,6 @@ class ExhibitorMainScreen extends GetView<ExhibitorNavController> {
           ExhibitorDrawer(
             isOpen: controller.isDrawerOpen.value,
             onClose: controller.closeDrawer,
-            companyName: 'Nova Textiles', // TODO: Get from controller/profile
             onLogout: controller.logout,
           ),
         ],

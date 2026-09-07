@@ -4,19 +4,18 @@ import 'package:get/get.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../routes/app_routes.dart';
+import '../ExhibitorNav/ExhibitorNavController.dart';
 
-class ExhibitorDrawer extends StatelessWidget {
+class ExhibitorDrawer extends GetView<ExhibitorNavController> {
   const ExhibitorDrawer({
     super.key,
     required this.isOpen,
     required this.onClose,
-    required this.companyName,
     required this.onLogout,
   });
 
   final bool isOpen;
   final VoidCallback onClose;
-  final String companyName;
   final VoidCallback onLogout;
 
   static double get _width => 300.w;
@@ -42,7 +41,12 @@ class ExhibitorDrawer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _DrawerHeader(companyName: companyName, onClose: onClose),
+                  Obx(() => _DrawerHeader(
+                    companyName: controller.userCompany.value,
+                    userName: controller.userName.value,
+                    avatar: controller.userAvatar.value,
+                    onClose: onClose,
+                  )),
                   Divider(height: 1.h, color: AppColors.border),
                   Expanded(
                     child: ListView(
@@ -54,15 +58,19 @@ class ExhibitorDrawer extends StatelessWidget {
                         _DrawerTile(
                           icon: Icons.dashboard_rounded,
                           label: 'Dashboard',
-                          selected: true,
-                          onTap: onClose,
+                          selected: controller.currentIndex.value == 0,
+                          onTap: () {
+                            onClose();
+                            controller.changePage(0);
+                          },
                         ),
                         _DrawerTile(
                           icon: Icons.leaderboard_rounded,
                           label: 'Lead pipeline',
+                          selected: controller.currentIndex.value == 1,
                           onTap: () {
                             onClose();
-                            // Get.toNamed(Routes.LEAD_PIPELINE);
+                            controller.changePage(1);
                           },
                         ),
                         _DrawerTile(
@@ -74,25 +82,14 @@ class ExhibitorDrawer extends StatelessWidget {
                           },
                         ),
                         SizedBox(height: 20.h),
-                        const _SectionLabel('INSIGHTS'),
-                        SizedBox(height: 8.h),
-                        _DrawerTile(
-                          icon: Icons.insert_chart_rounded,
-                          label: 'Analytics',
-                          onTap: () {
-                            onClose();
-                            // Get.toNamed(Routes.ANALYTICS);
-                          },
-                        ),
-                        SizedBox(height: 20.h),
                         const _SectionLabel('ACCOUNT'),
                         SizedBox(height: 8.h),
                         _DrawerTile(
-                          icon: Icons.storefront_rounded,
-                          label: 'Company profile',
+                          icon: Icons.person_outline_rounded,
+                          label: 'My Profile',
                           onTap: () {
                             onClose();
-                            Get.toNamed(Routes.EXHIBITOR_PROFILE);
+                            Get.toNamed(Routes.MY_PROFILE);
                           },
                         ),
                         _DrawerTile(
@@ -100,7 +97,7 @@ class ExhibitorDrawer extends StatelessWidget {
                           label: 'Settings',
                           onTap: () {
                             onClose();
-                            // Get.toNamed(Routes.SETTINGS);
+                            Get.toNamed(Routes.SETTINGS);
                           },
                         ),
                       ],
@@ -122,7 +119,7 @@ class ExhibitorDrawer extends StatelessWidget {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          'Exhibitor Portal',
+                          'Exhibitor Portal v1.0',
                           style: AppTextStyles.caption.copyWith(
                             fontSize: 10.sp,
                           ),
@@ -165,15 +162,22 @@ class _Scrim extends StatelessWidget {
 }
 
 class _DrawerHeader extends StatelessWidget {
-  const _DrawerHeader({required this.companyName, required this.onClose});
+  const _DrawerHeader({
+    required this.companyName,
+    required this.userName,
+    this.avatar,
+    required this.onClose,
+  });
 
   final String companyName;
+  final String userName;
+  final String? avatar;
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
     final initial =
-    companyName.trim().isNotEmpty ? companyName.trim()[0].toUpperCase() : 'E';
+    userName.trim().isNotEmpty ? userName.trim()[0].toUpperCase() : 'U';
 
     return Padding(
       padding: EdgeInsets.fromLTRB(18.w, 18.h, 12.w, 18.h),
@@ -196,12 +200,13 @@ class _DrawerHeader extends StatelessWidget {
                   offset: Offset(0, 6.h),
                 ),
               ],
+              image: (avatar != null && avatar!.isNotEmpty) ? DecorationImage(image: NetworkImage(avatar!), fit: BoxFit.cover) : null,
             ),
             alignment: Alignment.center,
-            child: Text(
+            child: (avatar == null || avatar!.isEmpty) ? Text(
               initial,
               style: TextStyle(color: Colors.white, fontSize: 19.sp, fontWeight: FontWeight.w800),
-            ),
+            ) : null,
           ),
           SizedBox(width: 13.w),
           Expanded(
@@ -209,10 +214,17 @@ class _DrawerHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  companyName.isEmpty ? 'Your Company' : companyName,
+                  userName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.body.copyWith(fontSize: 15.sp, fontWeight: FontWeight.w700),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  companyName.isEmpty ? 'Exhibitor' : companyName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.caption.copyWith(fontSize: 12.sp),
                 ),
                 SizedBox(height: 6.h),
                 Container(

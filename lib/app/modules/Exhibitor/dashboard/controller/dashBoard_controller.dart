@@ -5,6 +5,7 @@ import '../../../../data/models/lead.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../data/local/storage_service.dart';
 import '../../../../data/repositories/auth_repository.dart';
+import '../../../../data/repositories/lead_repository.dart';
 
 class DashboardStats {
   const DashboardStats({
@@ -20,7 +21,9 @@ class DashboardStats {
 
 class DashboardController extends GetxController {
   final AuthRepository _authRepository = AuthRepository();
-  final companyName = 'Nova Textiles'.obs; // TODO: pull from company profile
+  final LeadRepository _leadRepository = LeadRepository();
+  
+  final companyName = 'Exhibitor'.obs; 
   final isLoading = true.obs;
   final stats = Rxn<DashboardStats>();
   final recentLeads = <Lead>[].obs;
@@ -40,32 +43,40 @@ class DashboardController extends GetxController {
 
   Future<void> loadDashboard() async {
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 500));
+    
+    final result = await _leadRepository.getDashboardData();
 
-    stats.value = const DashboardStats(
-      leadsToday: 42,
-      hotLeads: 11,
-      conversionPercent: 18,
-    );
+    if (result.success) {
+      final data = result.data?['data'];
+      if (data != null) {
+        stats.value = DashboardStats(
+          leadsToday: data['total_lead'] ?? 0,
+          hotLeads: data['hot_lead'] ?? 0,
+          conversionPercent: (data['conversion_rate'] as num?)?.toInt() ?? 0,
+        );
 
-    recentLeads.assignAll(const [
-      Lead(
-        id: '1',
-        name: 'Rahul Mehta',
-        title: 'Marketing Head, Nova Textiles',
-        company: 'Nova Textiles',
-        temperature: LeadTemperature.hot,
-      ),
-      Lead(
-        id: '2',
-        name: 'Sara Khan',
-        title: 'Procurement, Delta Corp',
-        company: 'Delta Corp',
-        temperature: LeadTemperature.warm,
-      ),
-    ]);
+        final List<dynamic> leadsJson = data['recent_leads'] ?? [];
+        recentLeads.assignAll(leadsJson.map((json) {
+          return Lead(
+            id: json['id'].toString(),
+            name: json['name'] ?? '',
+            title: json['designation'] ?? '',
+            company: json['company_name'] ?? '',
+            temperature: _mapStatusToTemperature(json['status']),
+          );
+        }).toList());
+      }
+    } else {
+      Get.snackbar("Error", result.error?.message ?? "Failed to load dashboard");
+    }
 
     isLoading.value = false;
+  }
+
+  LeadTemperature _mapStatusToTemperature(dynamic status) {
+    // Assuming status 1 is Hot for now, adjust based on actual logic
+    if (status == 1) return LeadTemperature.hot;
+    return LeadTemperature.newLead;
   }
 
   void onNavTap(int index) {

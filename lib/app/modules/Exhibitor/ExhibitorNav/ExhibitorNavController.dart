@@ -2,12 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/local/storage_service.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../../data/repositories/profile_repository.dart';
 import '../../../routes/app_routes.dart';
 
 class ExhibitorNavController extends GetxController {
   final AuthRepository _authRepository = AuthRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
+  
   final currentIndex = 0.obs;
   final isDrawerOpen = false.obs;
+
+  // Profile data for drawer
+  final userName = "User".obs;
+  final userEmail = "".obs;
+  final userCompany = "".obs;
+  final userAvatar = RxnString();
+  final isLoadingProfile = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchProfile();
+  }
+
+  Future<void> fetchProfile() async {
+    isLoadingProfile.value = true;
+    final result = await _profileRepository.getMyProfile();
+    if (result.success) {
+      final data = result.data?['data'];
+      if (data != null) {
+        userName.value = data['name'] ?? "User";
+        userEmail.value = data['email'] ?? "";
+        userCompany.value = data['company'] ?? "";
+        userAvatar.value = data['avatar'];
+      }
+    }
+    isLoadingProfile.value = false;
+  }
 
   void changePage(int index) {
     if (index == 2) {
@@ -41,7 +72,7 @@ class ExhibitorNavController extends GetxController {
                 barrierDismissible: false,
               );
 
-              // Call Logout API (passing bearer token is handled by ApiService.instance.setToken)
+              // Call Logout API
               await _authRepository.logout();
 
               // Clear Local Storage

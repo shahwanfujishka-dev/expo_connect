@@ -24,6 +24,7 @@ class Lead {
     required this.temperature,
     this.phone,
     this.email,
+    this.whatsapp,
     this.pendingSync = false,
   });
 
@@ -34,7 +35,32 @@ class Lead {
   final LeadTemperature temperature;
   final String? phone;
   final String? email;
+  final String? whatsapp;
 
   // True while a lead captured offline hasn't synced to the server yet.
   final bool pendingSync;
+
+  Lead copyWith({
+    String? id,
+    String? name,
+    String? title,
+    String? company,
+    LeadTemperature? temperature,
+    String? phone,
+    String? email,
+    String? whatsapp,
+    bool? pendingSync,
+  }) {
+    return Lead(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      title: title ?? this.title,
+      company: company ?? this.company,
+      temperature: temperature ?? this.temperature,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      whatsapp: whatsapp ?? this.whatsapp,
+      pendingSync: pendingSync ?? this.pendingSync,
+    );
+  }
 }

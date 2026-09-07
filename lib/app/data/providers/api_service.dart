@@ -128,6 +128,42 @@ class ApiService {
     );
   }
 
+  Future<ApiResult<T>> put<T>(
+    String path, {
+    dynamic body,
+    Map<String, dynamic>? query,
+    AuthMode authMode = AuthMode.header,
+    T Function(dynamic json)? parser,
+  }) {
+    return _request<T>(
+      () => _dio.put(
+        path,
+        data: body,
+        queryParameters: _buildQuery(query, authMode),
+        options: _buildOptions(authMode),
+      ),
+      parser: parser,
+    );
+  }
+
+  Future<ApiResult<T>> delete<T>(
+    String path, {
+    dynamic body,
+    Map<String, dynamic>? query,
+    AuthMode authMode = AuthMode.header,
+    T Function(dynamic json)? parser,
+  }) {
+    return _request<T>(
+      () => _dio.delete(
+        path,
+        data: body,
+        queryParameters: _buildQuery(query, authMode),
+        options: _buildOptions(authMode),
+      ),
+      parser: parser,
+    );
+  }
+
   Future<ApiResult<T>> get<T>(
     String path, {
     Map<String, dynamic>? query,

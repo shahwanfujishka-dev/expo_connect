@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../data/models/lead.dart';
 import '../ExhibitorNav/ExhibitorNavController.dart';
@@ -24,9 +25,7 @@ class DashboardScreen extends GetView<DashboardController> {
         top: false,
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
+            return const _DashboardShimmer();
           }
           final stats = controller.stats.value!;
           return RefreshIndicator(
@@ -41,7 +40,7 @@ class DashboardScreen extends GetView<DashboardController> {
                 Row(
                   children: [
                     Expanded(
-                      child: _StatCard(label: 'Leads today', value: '${stats.leadsToday}'),
+                      child: _StatCard(label: 'Total leads', value: '${stats.leadsToday}'),
                     ),
                     SizedBox(width: 10.w),
                     Expanded(
@@ -116,6 +115,153 @@ class DashboardScreen extends GetView<DashboardController> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class _DashboardShimmer extends StatelessWidget {
+  const _DashboardShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[200]!,
+      highlightColor: Colors.grey[50]!,
+      child: ListView(
+        padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          // Good morning shimmer
+          Container(
+            width: 80.w,
+            height: 14.h,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+          ),
+          SizedBox(height: 6.h),
+          Container(
+            width: 160.w,
+            height: 24.h,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+          ),
+          SizedBox(height: 20.h),
+          
+          // Stat Cards shimmer
+          Row(
+            children: List.generate(3, (index) => Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: index == 2 ? 0 : 10.w),
+                height: 65.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+              ),
+            )),
+          ),
+          SizedBox(height: 16.h),
+          
+          // Action Chips shimmer
+          Row(
+            children: List.generate(3, (index) => Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: index == 2 ? 0 : 10.w),
+                height: 75.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+              ),
+            )),
+          ),
+          SizedBox(height: 24.h),
+          
+          // Recent Leads Header shimmer
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 100.w,
+                height: 18.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+              Container(
+                width: 50.w,
+                height: 14.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          
+          // Lead Tiles shimmer
+          ...List.generate(4, (index) => Container(
+            margin: EdgeInsets.only(bottom: 10.h),
+            padding: EdgeInsets.all(12.r),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: Colors.white),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36.r,
+                  height: 36.r,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 120.w,
+                        height: 14.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      Container(
+                        width: 80.w,
+                        height: 10.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 40.w,
+                  height: 20.h,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ],
       ),
     );
   }

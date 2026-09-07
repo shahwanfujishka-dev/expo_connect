@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../data/models/lead.dart';
 import '../../../../routes/app_routes.dart';
@@ -31,14 +32,36 @@ class LeadPipelineScreen extends GetView<LeadPipelineController> {
             _buildFilterRow(),
             SizedBox(height: 16.h),
             Expanded(
-              child: Obx(() => ListView.separated(
+              child: Obx(() {
+                if (controller.isLoading.value && controller.allLeads.isEmpty) {
+                  return const _LeadsShimmer();
+                }
+                
+                if (controller.filteredLeads.isEmpty) {
+                  return RefreshIndicator(
+                    onRefresh: controller.fetchLeads,
+                    child: ListView(
+                      children: [
+                        SizedBox(height: 100.h),
+                        const Center(child: Text("No leads found")),
+                      ],
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: controller.fetchLeads,
+                  child: ListView.separated(
                     padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
                     itemCount: controller.filteredLeads.length,
                     separatorBuilder: (context, index) => SizedBox(height: 12.h),
                     itemBuilder: (context, index) {
                       return _LeadPipelineTile(lead: controller.filteredLeads[index]);
                     },
-                  )),
+                  ),
+                );
+              }),
             ),
           ],
         ),
@@ -84,6 +107,30 @@ class LeadPipelineScreen extends GetView<LeadPipelineController> {
   }
 }
 
+class _LeadsShimmer extends StatelessWidget {
+  const _LeadsShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[200]!,
+      highlightColor: Colors.grey[50]!,
+      child: ListView.separated(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
+        itemCount: 6,
+        separatorBuilder: (context, index) => SizedBox(height: 12.h),
+        itemBuilder: (context, index) => Container(
+          height: 70.h,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LeadPipelineTile extends StatelessWidget {
   const _LeadPipelineTile({required this.lead});
   final Lead lead;
@@ -104,7 +151,9 @@ class _LeadPipelineTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tagColor = _tagColor();
-    final initials = lead.name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase();
+    final initials = lead.name.isNotEmpty 
+        ? lead.name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+        : '?';
 
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.LEAD_DETAILS, arguments: lead),

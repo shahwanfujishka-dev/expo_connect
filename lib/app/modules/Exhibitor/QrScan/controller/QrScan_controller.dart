@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../data/repositories/lead_repository.dart';
 
 class QrScanController extends GetxController {
+  final LeadRepository _leadRepository = LeadRepository();
   final isProcessing = false.obs;
   final errorText = RxnString();
 
@@ -22,28 +24,30 @@ class QrScanController extends GetxController {
     isProcessing.value = true;
     errorText.value = null;
 
-    // Simulate verification
-    await Future.delayed(const Duration(milliseconds: 800));
+    final result = await _leadRepository.scanQrCode(rawValue);
+
     isProcessing.value = false;
 
-    Get.toNamed(
-      Routes.LEAD_SAVED,
-      arguments: {
-        'name': 'Rahul Mehta',
-        'assignedTo': 'You',
-      },
-    );
+    if (result.success) {
+      final data = result.data;
+      // Assuming the API returns the lead details or at least a success message
+      // and we navigate to LEAD_SAVED as before.
+      Get.toNamed(
+        Routes.LEAD_SAVED,
+        arguments: {
+          'name': data?['data']?['name'] ?? 'Visitor',
+          'assignedTo': 'You',
+        },
+      );
+    } else {
+      errorText.value = result.error?.message ?? "Failed to capture lead";
+      Get.snackbar("Error", errorText.value!);
+    }
   }
 
   void simulateScanTapped() {
     if (!kDebugMode) return;
-    Get.toNamed(
-      Routes.LEAD_SAVED,
-      arguments: {
-        'name': 'Rahul Mehta (Simulated)',
-        'assignedTo': 'You',
-      },
-    );
+    onCodeDetected(BarcodeCapture(barcodes: [Barcode(rawValue: 'b118f4f1-c9e4-4475-a7d0-e5e2fdcc3640')]));
   }
 
   @override

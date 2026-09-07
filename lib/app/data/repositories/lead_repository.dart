@@ -31,7 +31,40 @@ class LeadRepository {
     return await _apiService.post<Map<String, dynamic>>(
       Endpoints.manualLeadCapture,
       body: formData,
-      authMode: AuthMode.header, // Using header auth mode as it requires bearer token
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> scanQrCode(String qrCode) async {
+    final formData = dio.FormData.fromMap({
+      'qr_code': qrCode,
+    });
+
+    return await _apiService.post<Map<String, dynamic>>(
+      Endpoints.scanQrCode,
+      body: formData,
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> getDashboardData() async {
+    return await _apiService.get<Map<String, dynamic>>(
+      Endpoints.dashboard,
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> getAllLeads() async {
+    return await _apiService.get<Map<String, dynamic>>(
+      Endpoints.leads,
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> getLeadDetails(String id) async {
+    return await _apiService.get<Map<String, dynamic>>(
+      "${Endpoints.leadShow}/$id",
+      authMode: AuthMode.header,
     );
   }
 }

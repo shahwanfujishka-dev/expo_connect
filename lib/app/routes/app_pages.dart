@@ -4,12 +4,16 @@ import 'package:expo_connect/app/modules/Exhibitor/business_card/BusinessCardSca
 import 'package:expo_connect/app/modules/Exhibitor/dashboard/Dashboard_Screen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/dashboard/binding/dashboard_binding.dart';
 import 'package:expo_connect/app/modules/Exhibitor/exhibitor_profile/exhibitor_profile_screen.dart';
+import 'package:expo_connect/app/modules/Exhibitor/exhibitor_profile/my_profile_screen.dart';
+import 'package:expo_connect/app/modules/Exhibitor/exhibitor_profile/binding/my_profile_binding.dart';
 import 'package:expo_connect/app/modules/Exhibitor/leads_save_screen/LeadSavedScreen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_capture_screen/LeadCaptureScreen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_capture_screen/binding/lead_capture_binding.dart';
 import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_details/binding/lead_details_binding.dart';
 import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_details/lead_details_screen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/manual_entry/ManualEntryScreen.dart';
+import 'package:expo_connect/app/modules/Exhibitor/settings/binding/settings_binding.dart';
+import 'package:expo_connect/app/modules/Exhibitor/settings/settings_screen.dart';
 import 'package:expo_connect/app/modules/Visitor/discover/view/visitor_discover_screen.dart';
 import 'package:expo_connect/app/modules/signUp/binding/signUp_binding.dart';
 import 'package:expo_connect/app/modules/signUp/signUp_Screen.dart';
@@ -140,6 +144,16 @@ class AppPages {
       name: Routes.LEAD_DETAILS,
       page: () => const LeadDetailsScreen(),
       binding: LeadDetailsBinding(),
+    ),
+    GetPage(
+      name: Routes.MY_PROFILE,
+      page: () => const MyProfileScreen(),
+      binding: MyProfileBinding(),
+    ),
+    GetPage(
+      name: Routes.SETTINGS,
+      page: () => const SettingsScreen(),
+      binding: SettingsBinding(),
     ),
 
     // Visitor Pages

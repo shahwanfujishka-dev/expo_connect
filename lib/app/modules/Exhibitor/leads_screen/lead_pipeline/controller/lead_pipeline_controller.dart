@@ -1,68 +1,51 @@
 import 'package:get/get.dart';
 import '../../../../../data/models/lead.dart';
+import '../../../../../data/repositories/lead_repository.dart';
 
 class LeadPipelineController extends GetxController {
+  final LeadRepository _leadRepository = LeadRepository();
+  
   final allLeads = <Lead>[].obs;
   final filteredLeads = <Lead>[].obs;
   final selectedFilter = 'All'.obs;
+  final isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadLeads();
+    fetchLeads();
   }
 
-  void loadLeads() {
-    // Simulated data with phone and email for testing actions
-    final mockLeads = [
-      const Lead(
-        id: '1',
-        name: 'Rahul Mehta',
-        title: 'Marketing Head',
-        company: 'Nova Textiles',
-        temperature: LeadTemperature.hot,
-        phone: '+919876543210',
-        email: 'rahul@novatextiles.com',
-      ),
-      const Lead(
-        id: '2',
-        name: 'Sara Khan',
-        title: 'Procurement',
-        company: 'Delta Corp',
-        temperature: LeadTemperature.warm,
-        phone: '+919988776655',
-        email: 'sara@deltacorp.com',
-      ),
-      const Lead(
-        id: '3',
-        name: 'Amit Lal',
-        title: 'CEO',
-        company: 'Bluestone Inc',
-        temperature: LeadTemperature.cold,
-        phone: '+919000011111',
-        email: 'amit@bluestone.com',
-      ),
-      const Lead(
-        id: '4',
-        name: 'Jon Park',
-        title: 'Designer',
-        company: 'Rivet Labs',
-        temperature: LeadTemperature.newLead,
-        phone: '+918888877777',
-        email: 'jon@rivetlabs.com',
-      ),
-      const Lead(
-        id: '5',
-        name: 'Priya Singh',
-        title: 'Manager',
-        company: 'Tech Solutions',
-        temperature: LeadTemperature.hot,
-        phone: '+917777766666',
-        email: 'priya@techsolutions.com',
-      ),
-    ];
-    allLeads.assignAll(mockLeads);
-    applyFilter('All');
+  Future<void> fetchLeads() async {
+    isLoading.value = true;
+    final result = await _leadRepository.getAllLeads();
+    
+    if (result.success) {
+      final List<dynamic> leadsJson = result.data?['data'] ?? [];
+      final fetchedLeads = leadsJson.map((json) {
+        return Lead(
+          id: json['id'].toString(),
+          name: json['name'] ?? '',
+          title: json['designation'] ?? '',
+          company: json['company_name'] ?? '',
+          temperature: _mapStatusToTemperature(json['status']),
+        );
+      }).toList();
+      
+      allLeads.assignAll(fetchedLeads);
+      applyFilter(selectedFilter.value);
+    } else {
+      Get.snackbar("Error", result.error?.message ?? "Failed to fetch leads");
+    }
+    
+    isLoading.value = false;
+  }
+
+  LeadTemperature _mapStatusToTemperature(dynamic status) {
+    // Mapping status from API to LeadTemperature
+    if (status == 1) return LeadTemperature.hot;
+    // Add more mapping logic if needed
+    return LeadTemperature.newLead;
   }
 
   void applyFilter(String filter) {
@@ -70,7 +53,9 @@ class LeadPipelineController extends GetxController {
     if (filter == 'All') {
       filteredLeads.assignAll(allLeads);
     } else {
-      filteredLeads.assignAll(allLeads.where((lead) => lead.temperature.label == filter).toList());
+      filteredLeads.assignAll(
+        allLeads.where((lead) => lead.temperature.label == filter).toList(),
+      );
     }
   }
 
