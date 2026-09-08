@@ -29,6 +29,8 @@ class Endpoints {
 
   // Sales Team
   static const String salesTeam = "/api/sales-team";
+  static const String salesTeamPerformance = "/api/sales-team/performance";
+  static String salesPersonDetails(int id) => "/api/sales-team/$id";
 
   // Dropdowns
   static const String eventsDropdown = "/api/dropdown/events";

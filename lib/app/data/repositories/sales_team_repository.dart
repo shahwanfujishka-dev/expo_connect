@@ -9,6 +9,23 @@ class SalesTeamRepository {
     return _apiService.get<SalesTeamResponse>(
       Endpoints.salesTeam,
       parser: (json) => SalesTeamResponse.fromJson(json),
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<SalesPerson>> getSalesPersonDetails(int id) async {
+    return _apiService.get<SalesPerson>(
+      Endpoints.salesPersonDetails(id),
+      parser: (json) => SalesPerson.fromJson(json['data']),
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<TeamPerformanceResponse>> getTeamPerformance() async {
+    return _apiService.get<TeamPerformanceResponse>(
+      Endpoints.salesTeamPerformance,
+      parser: (json) => TeamPerformanceResponse.fromJson(json),
+      authMode: AuthMode.header,
     );
   }
 
@@ -24,6 +41,7 @@ class SalesTeamRepository {
         'email': email,
         'role': role,
       },
+      authMode: AuthMode.header,
     );
   }
 }

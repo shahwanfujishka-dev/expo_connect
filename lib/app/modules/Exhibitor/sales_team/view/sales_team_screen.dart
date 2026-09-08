@@ -6,6 +6,8 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../data/models/sales_team_model.dart';
 import '../controller/sales_team_controller.dart';
+import '../../../../data/services/endpoints.dart';
+import '../../../../routes/app_routes.dart';
 
 class SalesTeamScreen extends GetView<SalesTeamController> {
   const SalesTeamScreen({super.key});
@@ -32,58 +34,67 @@ class SalesTeamScreen extends GetView<SalesTeamController> {
           return const _SalesTeamShimmer();
         }
 
-        if (controller.errorMessage.isNotEmpty && controller.salesTeam.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                SizedBox(height: 16.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+        return RefreshIndicator(
+          onRefresh: controller.refreshData,
+          color: AppColors.primary,
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              if (controller.performanceData.value != null)
+                SliverToBoxAdapter(
+                  child: _PerformanceSummary(performance: controller.performanceData.value!),
+                ),
+              
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
+                sliver: SliverToBoxAdapter(
                   child: Text(
-                    controller.errorMessage.value,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body,
+                    'TEAM MEMBERS',
+                    style: AppTextStyles.caption.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ),
-                SizedBox(height: 12.h),
-                TextButton(
-                  onPressed: controller.fetchSalesTeam,
-                  child: const Text("Retry"),
-                ),
-              ],
-            ),
-          );
-        }
+              ),
 
-        if (controller.salesTeam.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.groups_outlined, size: 64.sp, color: AppColors.textSecondary.withOpacity(0.5)),
-                SizedBox(height: 16.h),
-                Text(
-                  "No sales team members found",
-                  style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              if (controller.salesTeam.isEmpty && !controller.isLoading.value)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.groups_outlined, size: 64.sp, color: AppColors.textSecondary.withOpacity(0.5)),
+                        SizedBox(height: 16.h),
+                        Text(
+                          "No sales team members found",
+                          style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final member = controller.salesTeam[index];
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 12.h),
+                          child: _SalesPersonTile(member: member),
+                        );
+                      },
+                      childCount: controller.salesTeam.length,
+                    ),
+                  ),
                 ),
-              ],
-            ),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: controller.fetchSalesTeam,
-          color: AppColors.primary,
-          child: ListView.separated(
-            padding: EdgeInsets.all(20.r),
-            itemCount: controller.salesTeam.length,
-            separatorBuilder: (context, index) => SizedBox(height: 12.h),
-            itemBuilder: (context, index) {
-              final member = controller.salesTeam[index];
-              return _SalesPersonTile(member: member);
-            },
+              
+              SliverToBoxAdapter(child: SizedBox(height: 80.h)),
+            ],
           ),
         );
       }),
@@ -252,90 +263,237 @@ class SalesTeamScreen extends GetView<SalesTeamController> {
   }
 }
 
-class _SalesPersonTile extends StatelessWidget {
-  const _SalesPersonTile({required this.member});
-  final SalesPerson member;
+class _PerformanceSummary extends StatelessWidget {
+  const _PerformanceSummary({required this.performance});
+  final TeamPerformanceResponse performance;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.r),
+      margin: EdgeInsets.all(20.r),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.border),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.primary, AppColors.primaryDark],
+        ),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 48.r,
-                height: 48.r,
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  member.user.name.isNotEmpty ? member.user.name[0].toUpperCase() : '?',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryDark,
-                  ),
+              Text(
+                'Team Performance',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      member.user.name,
-                      style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    Text(
-                      member.role.toUpperCase(),
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  'Total Leads: ${performance.totalLeads}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          const Divider(height: 1, color: AppColors.border),
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _StatItem(label: 'Captured', value: member.capturedCount.toString()),
-              _StatItem(label: 'Assigned', value: member.assignedCount.toString()),
-              _StatItem(label: 'Converted', value: member.convertedCount.toString()),
+              _PerformanceStat(
+                label: 'Avg. Capture',
+                value: '${_calculateAvgCapture()}%',
+                icon: Icons.qr_code_scanner_rounded,
+              ),
+              _PerformanceStat(
+                label: 'Avg. Convert',
+                value: '${_calculateAvgConversion()}%',
+                icon: Icons.handshake_rounded,
+              ),
+              _PerformanceStat(
+                label: 'Members',
+                value: performance.members.length.toString(),
+                icon: Icons.people_alt_rounded,
+              ),
             ],
           ),
         ],
       ),
     );
   }
+
+  int _calculateAvgCapture() {
+    if (performance.members.isEmpty) return 0;
+    final sum = performance.members.fold<num>(0, (prev, element) => prev + element.captureRate);
+    return (sum / performance.members.length).round();
+  }
+
+  int _calculateAvgConversion() {
+    if (performance.members.isEmpty) return 0;
+    final sum = performance.members.fold<num>(0, (prev, element) => prev + element.conversionRate);
+    return (sum / performance.members.length).round();
+  }
+}
+
+class _PerformanceStat extends StatelessWidget {
+  const _PerformanceStat({required this.label, required this.value, required this.icon});
+  final String label;
+  final String value;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8.r),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Colors.white, size: 20.sp),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          value,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 10.sp,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SalesPersonTile extends StatelessWidget {
+  const _SalesPersonTile({required this.member});
+  final SalesPerson member;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Get.toNamed(Routes.TEAM_DETAILS, arguments: member.id),
+      child: Container(
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 48.r,
+                  height: 48.r,
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySoft,
+                    shape: BoxShape.circle,
+                    image: member.avatar != null
+                        ? DecorationImage(
+                            image: NetworkImage(Endpoints.baseUrl + '/public/storage/' + member.avatar!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  alignment: Alignment.center,
+                  child: member.avatar == null
+                      ? Text(
+                          (member.name ?? member.user?.name ?? '?')[0].toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryDark,
+                          ),
+                        )
+                      : null,
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        member.name ?? member.user?.name ?? 'Unknown',
+                        style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        member.role.toUpperCase(),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary.withOpacity(0.5)),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            const Divider(height: 1, color: AppColors.border),
+            SizedBox(height: 16.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _StatItem(label: 'Captured', value: member.capturedCount.toString(), color: Colors.blue),
+                _StatItem(label: 'Assigned', value: member.assignedCount.toString(), color: Colors.orange),
+                _StatItem(label: 'Converted', value: (member.convertedCount ?? 0).toString(), color: Colors.green),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _StatItem extends StatelessWidget {
-  const _StatItem({required this.label, required this.value});
+  const _StatItem({required this.label, required this.value, required this.color});
   final String label;
   final String value;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -348,9 +506,21 @@ class _StatItem extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        Text(
-          label,
-          style: AppTextStyles.caption.copyWith(fontSize: 10.sp),
+        SizedBox(height: 2.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+          child: Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              fontSize: 9.sp,
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ],
     );

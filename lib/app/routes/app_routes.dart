@@ -20,6 +20,7 @@ abstract class Routes {
   static const MY_PROFILE = '/my_profile';
   static const SETTINGS = '/settings';
   static const TEAM = '/team';
+  static const TEAM_DETAILS = '/team_details';
 
   // Visitor Routes
   static const VISITOR_MAIN = '/visitor_main';
