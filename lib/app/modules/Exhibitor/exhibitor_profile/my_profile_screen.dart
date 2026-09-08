@@ -1,3 +1,4 @@
+import 'package:expo_connect/app/data/services/endpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -281,7 +282,7 @@ class _ProfileHeader extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 4),
                   image: (avatar != null && avatar!.isNotEmpty)
-                      ? DecorationImage(image: NetworkImage(avatar!), fit: BoxFit.cover)
+                      ? DecorationImage(image: NetworkImage('${Endpoints.baseUrl}/public/storage/$avatar'), fit: BoxFit.cover)
                       : null,
                 ),
                 alignment: Alignment.center,

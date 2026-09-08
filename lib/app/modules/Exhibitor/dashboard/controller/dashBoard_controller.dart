@@ -6,6 +6,7 @@ import '../../../../routes/app_routes.dart';
 import '../../../../data/local/storage_service.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/lead_repository.dart';
+import '../../exhibitor_appbar/controller/event_dropdown_controller.dart';
 
 class DashboardStats {
   const DashboardStats({
@@ -44,7 +45,18 @@ class DashboardController extends GetxController {
   Future<void> loadDashboard() async {
     isLoading.value = true;
     
-    final result = await _leadRepository.getDashboardData();
+    // Get expo_id from dropdown controller
+    int? expoId;
+    if (Get.isRegistered<EventDropdownController>()) {
+      expoId = Get.find<EventDropdownController>().selectedEvent.value?.id;
+    }
+
+    if (expoId == null) {
+      isLoading.value = false;
+      return;
+    }
+
+    final result = await _leadRepository.getDashboardData(expoId: expoId);
 
     if (result.success) {
       final data = result.data?['data'];
@@ -74,7 +86,6 @@ class DashboardController extends GetxController {
   }
 
   LeadTemperature _mapStatusToTemperature(dynamic status) {
-    // Assuming status 1 is Hot for now, adjust based on actual logic
     if (status == 1) return LeadTemperature.hot;
     return LeadTemperature.newLead;
   }
@@ -119,16 +130,9 @@ class DashboardController extends GetxController {
           TextButton(
             onPressed: () async {
               Get.back(); // Close dialog
-              
-              // Optional: show loading
               Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
-              
-              // Call Logout API
               await _authRepository.logout();
-              
-              // Clear Local Storage
               await StorageService.logout();
-
               Get.offAllNamed(Routes.LOGIN);
             },
             child: const Text('Logout', style: TextStyle(color: Colors.red)),

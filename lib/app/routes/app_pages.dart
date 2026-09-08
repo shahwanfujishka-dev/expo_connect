@@ -12,6 +12,8 @@ import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_capture_scr
 import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_details/binding/lead_details_binding.dart';
 import 'package:expo_connect/app/modules/Exhibitor/leads_screen/lead_details/lead_details_screen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/manual_entry/ManualEntryScreen.dart';
+import 'package:expo_connect/app/modules/Exhibitor/sales_team/binding/sales_team_binding.dart';
+import 'package:expo_connect/app/modules/Exhibitor/sales_team/view/sales_team_screen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/settings/binding/settings_binding.dart';
 import 'package:expo_connect/app/modules/Exhibitor/settings/settings_screen.dart';
 import 'package:expo_connect/app/modules/Visitor/discover/view/visitor_discover_screen.dart';
@@ -154,6 +156,11 @@ class AppPages {
       name: Routes.SETTINGS,
       page: () => const SettingsScreen(),
       binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: Routes.TEAM,
+      page: () => const SalesTeamScreen(),
+      binding: SalesTeamBinding(),
     ),
 
     // Visitor Pages

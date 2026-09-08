@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../data/repositories/lead_repository.dart';
+import '../../exhibitor_appbar/controller/event_dropdown_controller.dart';
 
 class QrScanController extends GetxController {
   final LeadRepository _leadRepository = LeadRepository();
@@ -24,14 +25,25 @@ class QrScanController extends GetxController {
     isProcessing.value = true;
     errorText.value = null;
 
-    final result = await _leadRepository.scanQrCode(rawValue);
+    // Get expo_id from dropdown controller
+    int? expoId;
+    if (Get.isRegistered<EventDropdownController>()) {
+      expoId = Get.find<EventDropdownController>().selectedEvent.value?.id;
+    }
+
+    if (expoId == null) {
+      isProcessing.value = false;
+      errorText.value = "Please select an event first";
+      Get.snackbar("Error", errorText.value!);
+      return;
+    }
+
+    final result = await _leadRepository.scanQrCode(expoId: expoId, qrCode: rawValue);
 
     isProcessing.value = false;
 
     if (result.success) {
       final data = result.data;
-      // Assuming the API returns the lead details or at least a success message
-      // and we navigate to LEAD_SAVED as before.
       Get.toNamed(
         Routes.LEAD_SAVED,
         arguments: {

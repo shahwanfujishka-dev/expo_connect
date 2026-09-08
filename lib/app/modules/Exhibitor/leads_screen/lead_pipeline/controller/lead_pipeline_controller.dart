@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../../../../data/models/lead.dart';
 import '../../../../../data/repositories/lead_repository.dart';
+import '../../../exhibitor_appbar/controller/event_dropdown_controller.dart';
 
 class LeadPipelineController extends GetxController {
   final LeadRepository _leadRepository = LeadRepository();
@@ -18,9 +19,21 @@ class LeadPipelineController extends GetxController {
 
   Future<void> fetchLeads() async {
     isLoading.value = true;
-    final result = await _leadRepository.getAllLeads();
+
+    int? expoId;
+    if (Get.isRegistered<EventDropdownController>()) {
+      expoId = Get.find<EventDropdownController>().selectedEvent.value?.id;
+    }
+
+    if (expoId == null) {
+      isLoading.value = false;
+      return;
+    }
+
+    final result = await _leadRepository.getAllLeads(expoId: expoId);
     
     if (result.success) {
+      // Fix: result.data['data'] is already the list based on API logs
       final List<dynamic> leadsJson = result.data?['data'] ?? [];
       final fetchedLeads = leadsJson.map((json) {
         return Lead(
@@ -42,9 +55,7 @@ class LeadPipelineController extends GetxController {
   }
 
   LeadTemperature _mapStatusToTemperature(dynamic status) {
-    // Mapping status from API to LeadTemperature
     if (status == 1) return LeadTemperature.hot;
-    // Add more mapping logic if needed
     return LeadTemperature.newLead;
   }
 

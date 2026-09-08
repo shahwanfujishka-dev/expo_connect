@@ -19,14 +19,15 @@ class DashboardScreen extends GetView<DashboardController> {
       backgroundColor: AppColors.background,
       appBar: ExhibitorAppBar(
         onMenuTap: navCtrl.toggleDrawer,
-        showNotificationDot: true,
       ),
       body: SafeArea(
         top: false,
         child: Obx(() {
-          if (controller.isLoading.value) {
+          // Check for loading or null stats to avoid force-unwrap error
+          if (controller.isLoading.value || controller.stats.value == null) {
             return const _DashboardShimmer();
           }
+
           final stats = controller.stats.value!;
           return RefreshIndicator(
             color: AppColors.primary,

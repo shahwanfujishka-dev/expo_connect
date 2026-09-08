@@ -19,6 +19,7 @@ abstract class Routes {
   static const LEAD_DETAILS = '/lead_details';
   static const MY_PROFILE = '/my_profile';
   static const SETTINGS = '/settings';
+  static const TEAM = '/team';
 
   // Visitor Routes
   static const VISITOR_MAIN = '/visitor_main';

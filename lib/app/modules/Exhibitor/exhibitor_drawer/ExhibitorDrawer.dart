@@ -1,3 +1,4 @@
+import 'package:expo_connect/app/data/services/endpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -75,10 +76,10 @@ class ExhibitorDrawer extends GetView<ExhibitorNavController> {
                         ),
                         _DrawerTile(
                           icon: Icons.groups_rounded,
-                          label: 'Team',
+                          label: 'Sales Team',
                           onTap: () {
                             onClose();
-                            // Get.toNamed(Routes.TEAM);
+                            Get.toNamed(Routes.TEAM);
                           },
                         ),
                         SizedBox(height: 20.h),
@@ -200,7 +201,7 @@ class _DrawerHeader extends StatelessWidget {
                   offset: Offset(0, 6.h),
                 ),
               ],
-              image: (avatar != null && avatar!.isNotEmpty) ? DecorationImage(image: NetworkImage(avatar!), fit: BoxFit.cover) : null,
+              image: (avatar != null && avatar!.isNotEmpty) ? DecorationImage(image: NetworkImage('${Endpoints.baseUrl}/public/storage/$avatar'), fit: BoxFit.cover) : null,
             ),
             alignment: Alignment.center,
             child: (avatar == null || avatar!.isEmpty) ? Text(

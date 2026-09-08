@@ -26,7 +26,13 @@ class Endpoints {
   // Leads
   static const String leads = "/api/lead";
   static const String leadShow = "/api/lead/show"; // Needs ID suffix
-  
+
+  // Sales Team
+  static const String salesTeam = "/api/sales-team";
+
+  // Dropdowns
+  static const String eventsDropdown = "/api/dropdown/events";
+
   // Connect timeout
   static const int connectionTimeout = 30000;
 

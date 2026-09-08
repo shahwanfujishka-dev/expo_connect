@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../../data/repositories/lead_repository.dart';
 import '../../../../routes/app_routes.dart';
+import '../../exhibitor_appbar/controller/event_dropdown_controller.dart';
 
 class ManualEntryController extends GetxController {
   final LeadRepository _leadRepository = LeadRepository();
@@ -46,12 +47,24 @@ class ManualEntryController extends GetxController {
       return;
     }
 
+    // Get expo_id from dropdown controller
+    int? expoId;
+    if (Get.isRegistered<EventDropdownController>()) {
+      expoId = Get.find<EventDropdownController>().selectedEvent.value?.id;
+    }
+
+    if (expoId == null) {
+      errorText.value = "Please select an event from the dashboard first";
+      Get.snackbar("Error", errorText.value!);
+      return;
+    }
+
     isSaving.value = true;
     errorText.value = null;
-// print(ApiService.instance.setToken(authToken.toString());)
+
     try {
       final result = await _leadRepository.captureManualLead(
-        expoId: 1, // Using expoId as defined in repository
+        expoId: expoId,
         name: nameController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
