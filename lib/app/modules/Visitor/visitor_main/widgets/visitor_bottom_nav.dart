@@ -11,7 +11,7 @@ class VisitorNavItem {
 
 const visitorNavItems = [
   VisitorNavItem(Icons.explore_outlined, 'Discover'),
-  VisitorNavItem(Icons.event_note_outlined, 'Plan'),
+  VisitorNavItem(Icons.description_outlined, 'Brochure'),
   VisitorNavItem(Icons.qr_code_scanner_rounded, 'Scan'),
   VisitorNavItem(Icons.contact_phone_outlined, 'Contacts'),
   VisitorNavItem(Icons.account_circle_outlined, 'Profile'),

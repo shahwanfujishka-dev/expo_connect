@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../controller/visitor_qr_controller.dart';
 
@@ -13,30 +14,38 @@ class VisitorQrScanScreen extends GetView<VisitorQrController> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Mock Camera View
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.black,
-            child: Center(
-              child: Container(
-                width: 280.r,
-                height: 280.r,
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.primary, width: 2),
-                  borderRadius: BorderRadius.circular(24.r),
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 240.w,
-                        height: 2.h,
-                        color: AppColors.primary.withOpacity(0.5),
-                      ),
+          // Mobile Scanner
+          MobileScanner(
+            onDetect: (capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              for (final barcode in barcodes) {
+                if (barcode.rawValue != null) {
+                  controller.onScanSuccess(barcode.rawValue!);
+                  break;
+                }
+              }
+            },
+          ),
+          
+          // Scanner Overlay
+          Center(
+            child: Container(
+              width: 280.r,
+              height: 280.r,
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.primary, width: 2),
+                borderRadius: BorderRadius.circular(24.r),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 240.w,
+                      height: 2.h,
+                      color: AppColors.primary.withOpacity(0.5),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -63,6 +72,11 @@ class VisitorQrScanScreen extends GetView<VisitorQrController> {
                   ),
                 ),
                 const Spacer(),
+                Obx(() => controller.isLoading.value 
+                  ? const CircularProgressIndicator(color: AppColors.primary)
+                  : const SizedBox.shrink()
+                ),
+                const Spacer(),
                 Padding(
                   padding: EdgeInsets.only(bottom: 60.h),
                   child: Column(
@@ -76,10 +90,10 @@ class VisitorQrScanScreen extends GetView<VisitorQrController> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _ModeButton(label: "QR", isSelected: true, onTap: () {}),
-                          SizedBox(width: 12.w),
-                          _ModeButton(label: "Card", isSelected: false, onTap: () {}),
-                          SizedBox(width: 12.w),
-                          _ModeButton(label: "Manual", isSelected: false, onTap: () {}),
+                          // SizedBox(width: 12.w),
+                          // _ModeButton(label: "Card", isSelected: false, onTap: () {}),
+                          // SizedBox(width: 12.w),
+                          // _ModeButton(label: "Manual", isSelected: false, onTap: () {}),
                         ],
                       ),
                     ],

@@ -128,6 +128,24 @@ class ApiService {
     );
   }
 
+  Future<ApiResult<T>> patch<T>(
+    String path, {
+    dynamic body,
+    Map<String, dynamic>? query,
+    AuthMode authMode = AuthMode.header,
+    T Function(dynamic json)? parser,
+  }) {
+    return _request<T>(
+      () => _dio.patch(
+        path,
+        data: body,
+        queryParameters: _buildQuery(query, authMode),
+        options: _buildOptions(authMode),
+      ),
+      parser: parser,
+    );
+  }
+
   Future<ApiResult<T>> put<T>(
     String path, {
     dynamic body,

@@ -3,25 +3,51 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../controller/visitor_profile_controller.dart';
+import '../../visitor_main/controller/visitor_main_controller.dart';
 
 class VisitorProfileScreen extends GetView<VisitorProfileController> {
   const VisitorProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final mainController = Get.find<VisitorMainController>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        centerTitle: false,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: EdgeInsets.only(left: 4.w),
+          child: Text(
+            'My digital card',
+            style: AppTextStyles.heading,
+          ),
+        ),
+        // actions: [
+        //   IconButton(
+        //     onPressed: mainController.toggleDrawer,
+        //     icon: Container(
+        //       padding: EdgeInsets.all(8.r),
+        //       decoration: BoxDecoration(
+        //         color: AppColors.surface,
+        //         borderRadius: BorderRadius.circular(10.r),
+        //         border: Border.all(color: AppColors.border),
+        //       ),
+        //       child: Icon(Icons.menu_rounded, color: AppColors.primary, size: 20.sp),
+        //     ),
+        //   ),
+        //   SizedBox(width: 16.w),
+        // ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24.r),
+          padding: EdgeInsets.symmetric(horizontal: 24.r, vertical: 10.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'My digital card',
-                style: AppTextStyles.heading,
-              ),
-              SizedBox(height: 24.h),
               _DigitalCard(),
               SizedBox(height: 32.h),
               Row(
@@ -59,7 +85,7 @@ class VisitorProfileScreen extends GetView<VisitorProfileController> {
                 icon: Icons.logout,
                 label: "Logout",
                 isDestructive: true,
-                onTap: controller.logout, // Updated to call the controller's confirmed logout
+                onTap: controller.logout,
               ),
             ],
           ),
@@ -98,22 +124,22 @@ class _DigitalCard extends GetView<VisitorProfileController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(),
-          Text(
+          Obx(() => Text(
             controller.name.value,
             style: TextStyle(
               color: Colors.white,
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
-          ),
+          )),
           SizedBox(height: 4.h),
-          Text(
+          Obx(() => Text(
             "${controller.role.value}, ${controller.company.value}",
             style: TextStyle(
               color: Colors.white.withOpacity(0.8),
               fontSize: 14.sp,
             ),
-          ),
+          )),
           const Spacer(),
           Container(
             padding: EdgeInsets.all(16.r),

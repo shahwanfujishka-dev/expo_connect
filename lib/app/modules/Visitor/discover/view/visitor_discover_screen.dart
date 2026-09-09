@@ -5,77 +5,81 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../data/models/exhibitor_model.dart';
 import '../../../../routes/app_routes.dart';
+import '../../visitor_appbar/VisitorAppBar.dart';
 import '../controller/visitor_discover_controller.dart';
+import '../../visitor_main/controller/visitor_main_controller.dart';
 
 class VisitorDiscoverScreen extends GetView<VisitorDiscoverController> {
   const VisitorDiscoverScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final mainController = Get.find<VisitorMainController>();
+    
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 10.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Discover exhibitors',
-                    style: AppTextStyles.heading,
-                  ),
-                  SizedBox(height: 16.h),
-                  _StatsOverview(),
-                  SizedBox(height: 16.h),
-                  _SearchBar(onChanged: controller.onSearch),
-                  SizedBox(height: 16.h),
-                  _CategoryFilters(),
-                ],
-              ),
+      appBar: VisitorAppBar(
+        title: 'Discover exhibitors',
+        // onMenuTap: mainController.toggleDrawer,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 10.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _StatsOverview(),
+                SizedBox(height: 16.h),
+                _SearchBar(onChanged: controller.onSearch),
+                SizedBox(height: 16.h),
+                _CategoryFilters(),
+              ],
             ),
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value && controller.exhibitors.isEmpty) {
-                  return _LoadingShimmer();
-                }
+          ),
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value && controller.exhibitors.isEmpty) {
+                return _LoadingShimmer();
+              }
 
-                final list = controller.filteredExhibitors;
-                if (list.isEmpty) {
-                  return RefreshIndicator(
-                    onRefresh: controller.fetchDashboard,
-                    child: ListView(
-                      children: [
-                        SizedBox(height: 100.h),
-                        const Center(child: Text("No exhibitors found")),
-                      ],
-                    ),
-                  );
-                }
+              final list = controller.filteredExhibitors;
+              if (list.isEmpty) {
                 return RefreshIndicator(
                   onRefresh: controller.fetchDashboard,
-                  child: ListView.separated(
-                    padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
-                    itemCount: list.length,
-                    separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                    itemBuilder: (context, index) {
-                      final exhibitor = list[index];
-                      return GestureDetector(
-                        onTap: () => Get.toNamed(
-                          Routes.VISITOR_EXHIBITOR_DETAILS,
-                          arguments: exhibitor,
-                        ),
-                        child: _ExhibitorCard(exhibitor: exhibitor),
-                      );
-                    },
+                  child: ListView(
+                    children: [
+                      SizedBox(height: 100.h),
+                      const Center(child: Text("No exhibitors found")),
+                    ],
                   ),
                 );
-              }),
-            ),
-          ],
-        ),
+              }
+              return RefreshIndicator(
+                onRefresh: controller.fetchDashboard,
+                child: ListView.separated(
+                  padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
+                  itemCount: list.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    final exhibitor = list[index];
+                    return GestureDetector(
+                      onTap: () => Get.toNamed(
+                        Routes.VISITOR_EXHIBITOR_DETAILS,
+                        arguments: exhibitor,
+                      ),
+                      child: _ExhibitorCard(
+                        exhibitor: exhibitor,
+                        onFavoriteTap: () => controller.toggleFavorite(exhibitor),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
+          ),
+        ],
       ),
     );
   }
@@ -292,8 +296,9 @@ class _CategoryFilters extends GetView<VisitorDiscoverController> {
 }
 
 class _ExhibitorCard extends StatelessWidget {
-  const _ExhibitorCard({required this.exhibitor});
+  const _ExhibitorCard({required this.exhibitor, this.onFavoriteTap});
   final ExhibitorModel exhibitor;
+  final VoidCallback? onFavoriteTap;
 
   @override
   Widget build(BuildContext context) {
@@ -340,9 +345,14 @@ class _ExhibitorCard extends StatelessWidget {
               ],
             ),
           ),
-          if (exhibitor.isFavorite)
-            Icon(Icons.bookmark, color: AppColors.primary, size: 20.sp),
-          SizedBox(width: 8.w),
+          IconButton(
+            onPressed: onFavoriteTap,
+            icon: Icon(
+              exhibitor.isFavorite ? Icons.bookmark : Icons.bookmark_border,
+              color: exhibitor.isFavorite ? AppColors.primary : AppColors.textSecondary,
+              size: 20.sp,
+            ),
+          ),
           Icon(
             Icons.chevron_right_rounded,
             color: AppColors.textSecondary,

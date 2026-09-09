@@ -105,9 +105,9 @@ class SalesPersonDetailsScreen extends GetView<SalesPersonDetailsController> {
                 label: 'Phone',
                 value: member.phone ?? 'N/A',
               ),
-              
+
               SizedBox(height: 32.h),
-              
+
               // Statistics
               Row(
                 children: [

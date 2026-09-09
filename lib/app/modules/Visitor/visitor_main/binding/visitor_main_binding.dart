@@ -16,7 +16,9 @@ class VisitorMainBinding extends Bindings {
       () => VisitorDiscoverController(repository: Get.find<VisitorRepository>()),
     );
     Get.lazyPut<VisitorPlanController>(() => VisitorPlanController());
-    Get.lazyPut<VisitorContactsController>(() => VisitorContactsController());
+    Get.lazyPut<VisitorContactsController>(
+      () => VisitorContactsController(repository: Get.find<VisitorRepository>()),
+    );
     Get.lazyPut<MyProfileController>(() => MyProfileController());
     Get.lazyPut<VisitorProfileController>(() => VisitorProfileController());
   }

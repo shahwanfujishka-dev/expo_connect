@@ -1,6 +1,6 @@
+import 'package:expo_connect/app/modules/Exhibitor/exhibitor_profile/my_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../Exhibitor/exhibitor_profile/my_profile_screen.dart';
 import '../controller/visitor_main_controller.dart';
 import '../widgets/visitor_bottom_nav.dart';
 import '../../discover/view/visitor_discover_screen.dart';
@@ -17,12 +17,12 @@ class VisitorMainScreen extends GetView<VisitorMainController> {
       () => Scaffold(
         body: IndexedStack(
           index: controller.currentIndex.value,
-          children: [
-            const VisitorDiscoverScreen(),
-            const VisitorPlanScreen(),
-            const SizedBox.shrink(), // Placeholder for Scan
-            const VisitorContactsScreen(),
-            const MyProfileScreen(),
+          children: const [
+            VisitorDiscoverScreen(),
+            VisitorPlanScreen(),
+            SizedBox.shrink(), // Placeholder for Scan (handled via navigation in controller)
+            VisitorContactsScreen(),
+            MyProfileScreen(),
           ],
         ),
         bottomNavigationBar: VisitorBottomNav(

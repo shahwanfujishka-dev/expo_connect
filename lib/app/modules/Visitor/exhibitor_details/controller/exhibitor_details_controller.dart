@@ -46,13 +46,27 @@ class VisitorExhibitorDetailsController extends GetxController {
     return "";
   }
 
-  void toggleFavorite() {
-    isFavorite.value = !isFavorite.value;
-    // TODO: Update in database/API
+  Future<void> toggleFavorite() async {
+    await saveExhibitor();
   }
 
-  void saveExhibitor() {
-    Get.snackbar("Success", "${initialExhibitor.name} added to your plan");
+  Future<void> saveExhibitor() async {
+    try {
+      final result = await repository.saveExhibitor(1, int.parse(initialExhibitor.id));
+      if (result.success) {
+        isFavorite.value = !isFavorite.value;
+        Get.snackbar(
+          "Success", 
+          isFavorite.value 
+              ? "${initialExhibitor.name} added to your plan" 
+              : "${initialExhibitor.name} removed from your plan"
+        );
+      } else {
+        Get.snackbar("Error", result.error?.message ?? "Failed to update status");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    }
   }
 
   void downloadBrochure() {

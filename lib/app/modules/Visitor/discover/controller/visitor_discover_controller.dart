@@ -48,6 +48,41 @@ class VisitorDiscoverController extends GetxController {
     }
   }
 
+  Future<void> toggleFavorite(ExhibitorModel exhibitor) async {
+    try {
+      final result = await repository.saveExhibitor(1, int.parse(exhibitor.id));
+      if (result.success) {
+        final index = exhibitors.indexWhere((e) => e.id == exhibitor.id);
+        if (index != -1) {
+          final updated = ExhibitorModel(
+            id: exhibitor.id,
+            name: exhibitor.name,
+            category: exhibitor.category,
+            hall: exhibitor.hall,
+            booth: exhibitor.booth,
+            description: exhibitor.description,
+            logoUrl: exhibitor.logoUrl,
+            brochures: exhibitor.brochures,
+            isFavorite: !exhibitor.isFavorite,
+          );
+          exhibitors[index] = updated;
+          
+          Get.snackbar(
+            "Success", 
+            updated.isFavorite 
+                ? "${exhibitor.name} added to your plan" 
+                : "${exhibitor.name} removed from your plan",
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } else {
+        Get.snackbar("Error", result.error?.message ?? "Failed to update status");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    }
+  }
+
   List<ExhibitorModel> get filteredExhibitors {
     return exhibitors.where((exhibitor) {
       final matchesSearch = exhibitor.name

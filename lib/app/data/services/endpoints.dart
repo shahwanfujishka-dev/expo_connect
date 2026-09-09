@@ -22,11 +22,20 @@ class Endpoints {
   // Lead Capture
   static const String manualLeadCapture = "/api/lead-capture/manual";
   static const String scanQrCode = "/api/lead-capture/scan-qrcode";
+  static const String visitorScanQrCode = "/api/visitor/lead-capture/scan-qrcode";
   
   // Dashboard
   static const String dashboard = "/api/dashboard";
   static const String visitorDashboard = "/api/visitor/dashboard";
   static const String visitorExhibitorDetails = "/api/visitor/dashboard/show";
+  static const String visitorSaveExhibitor = "/api/visitor/dashboard/save";
+
+  // Contacts
+  static const String visitorContactBook = "/api/visitor/contact-book";
+  static const String visitorContactStatus = "/api/visitor/contact-book/status";
+  static const String visitorContactFavorite = "/api/visitor/contact-book/favorite";
+  static const String visitorContactNotes = "/api/visitor/contact-book/notes";
+  static String visitorDeleteContact(int id) => "/api/visitor/contact-book/$id";
 
   // Leads
   static const String leads = "/api/lead";

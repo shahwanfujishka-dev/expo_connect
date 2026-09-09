@@ -1,5 +1,6 @@
 class ExhibitorModel {
   final String id;
+  final int? contactId;
   final String name;
   final String category;
   final String hall;
@@ -8,9 +9,12 @@ class ExhibitorModel {
   final String? logoUrl;
   final List<String>? brochures;
   final bool isFavorite;
+  final String? planStatus;
+  final String? notes;
 
   ExhibitorModel({
     required this.id,
+    this.contactId,
     required this.name,
     required this.category,
     required this.hall,
@@ -19,6 +23,8 @@ class ExhibitorModel {
     this.logoUrl,
     this.brochures,
     this.isFavorite = false,
+    this.planStatus,
+    this.notes,
   });
 
   String get initials {
