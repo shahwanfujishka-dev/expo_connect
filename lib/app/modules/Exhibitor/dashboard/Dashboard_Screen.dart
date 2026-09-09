@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../data/models/lead.dart';
+import '../../../routes/app_routes.dart';
 import '../ExhibitorNav/ExhibitorNavController.dart';
 import '../exhibitor_appbar/ExhibitorAppBar.dart';
 import 'controller/dashBoard_controller.dart';
@@ -152,7 +153,7 @@ class _DashboardShimmer extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          
+
           // Stat Cards shimmer
           Row(
             children: List.generate(3, (index) => Expanded(
@@ -167,7 +168,7 @@ class _DashboardShimmer extends StatelessWidget {
             )),
           ),
           SizedBox(height: 16.h),
-          
+
           // Action Chips shimmer
           Row(
             children: List.generate(3, (index) => Expanded(
@@ -182,7 +183,7 @@ class _DashboardShimmer extends StatelessWidget {
             )),
           ),
           SizedBox(height: 24.h),
-          
+
           // Recent Leads Header shimmer
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,7 +207,7 @@ class _DashboardShimmer extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12.h),
-          
+
           // Lead Tiles shimmer
           ...List.generate(4, (index) => Container(
             margin: EdgeInsets.only(bottom: 10.h),
@@ -381,68 +382,71 @@ class _LeadTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final tagColor = _tagColor();
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 5.h),
-      padding: EdgeInsets.all(12.r),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 18.r,
-            backgroundColor: AppColors.primarySoft,
-            child: Text(
-              lead.name.isNotEmpty ? lead.name[0] : '?',
-              style: TextStyle(
-                  color: AppColors.primaryDark,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14.sp),
+    return GestureDetector(
+      onTap: () => Get.toNamed(Routes.LEAD_DETAILS, arguments: lead),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 5.h),
+        padding: EdgeInsets.all(12.r),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 18.r,
+              backgroundColor: AppColors.primarySoft,
+              child: Text(
+                lead.name.isNotEmpty ? lead.name[0] : '?',
+                style: TextStyle(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14.sp),
+              ),
             ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        lead.name,
-                        style: AppTextStyles.body.copyWith(fontSize: 14.sp),
-                        overflow: TextOverflow.ellipsis,
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          lead.name,
+                          style: AppTextStyles.body.copyWith(fontSize: 14.sp),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    if (lead.pendingSync) ...[
-                      SizedBox(width: 6.w),
-                      Icon(Icons.sync, size: 13.sp, color: AppColors.textSecondary),
+                      if (lead.pendingSync) ...[
+                        SizedBox(width: 6.w),
+                        Icon(Icons.sync, size: 13.sp, color: AppColors.textSecondary),
+                      ],
                     ],
-                  ],
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  lead.title,
-                  style: AppTextStyles.subText,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    lead.title,
+                    style: AppTextStyles.subText,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: tagColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8.r),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: tagColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Text(
+                lead.status_name,
+                style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700, color: tagColor),
+              ),
             ),
-            child: Text(
-              lead.temperature.label,
-              style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700, color: tagColor),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,42 +1,52 @@
 import 'package:get/get.dart';
 import '../../../../data/models/exhibitor_model.dart';
+import '../../../../data/repositories/visitor_repository.dart';
 
 class VisitorDiscoverController extends GetxController {
+  final VisitorRepository repository;
+  VisitorDiscoverController({required this.repository});
+
   final searchQuery = "".obs;
   final selectedCategory = "All".obs;
+  final isLoading = false.obs;
 
   final categories = ["All", "Textiles", "Tech", "Logistics"];
+  final exhibitors = <ExhibitorModel>[].obs;
+  final stats = <String, dynamic>{}.obs;
 
-  final exhibitors = <ExhibitorModel>[
-    ExhibitorModel(
-      id: "1",
-      name: "Nova Textiles",
-      category: "Textiles",
-      hall: "Hall 2",
-      booth: "Booth A52",
-    ),
-    ExhibitorModel(
-      id: "2",
-      name: "Orbit Retail",
-      category: "Tech",
-      hall: "Hall 1",
-      booth: "Booth C21",
-    ),
-    ExhibitorModel(
-      id: "3",
-      name: "Bluewave Inc",
-      category: "Logistics",
-      hall: "Hall 3",
-      booth: "Booth B10",
-    ),
-    ExhibitorModel(
-      id: "4",
-      name: "Circuit Co",
-      category: "Tech",
-      hall: "Hall 1",
-      booth: "Booth D05",
-    ),
-  ].obs;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchDashboard();
+  }
+
+  Future<void> fetchDashboard() async {
+    isLoading.value = true;
+    try {
+      final result = await repository.getVisitorDashboard(1);
+      if (result.success && result.data != null) {
+        final responseData = result.data!['data'] ?? {};
+        final List companiesData = responseData['companies'] ?? responseData['exhibitors'] ?? [];
+        
+        exhibitors.value = companiesData.map((e) => ExhibitorModel(
+          id: e['id'].toString(),
+          name: e['name'] ?? e['company_name'] ?? '',
+          category: e['category'] ?? 'All',
+          hall: e['hall'] ?? '',
+          booth: e['stall'] ?? '',
+          isFavorite: e['is_saved'] ?? false,
+        )).toList();
+        
+        stats.value = responseData['stats'] ?? {};
+      } else {
+        Get.snackbar("Error", result.error?.message ?? "Failed to load dashboard");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   List<ExhibitorModel> get filteredExhibitors {
     return exhibitors.where((exhibitor) {

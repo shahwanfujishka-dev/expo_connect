@@ -19,6 +19,7 @@ class Lead {
   const Lead({
     required this.id,
     required this.name,
+    required this.status_name,
     required this.title,
     required this.company,
     required this.temperature,
@@ -30,6 +31,7 @@ class Lead {
 
   final String id;
   final String name;
+  final String status_name;
   final String title; // e.g. "Marketing Head, Nova Textiles"
   final String company;
   final LeadTemperature temperature;
@@ -43,6 +45,7 @@ class Lead {
   Lead copyWith({
     String? id,
     String? name,
+    String? status_name,
     String? title,
     String? company,
     LeadTemperature? temperature,
@@ -54,6 +57,7 @@ class Lead {
     return Lead(
       id: id ?? this.id,
       name: name ?? this.name,
+      status_name: status_name ?? this.status_name,
       title: title ?? this.title,
       company: company ?? this.company,
       temperature: temperature ?? this.temperature,

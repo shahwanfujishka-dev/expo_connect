@@ -51,7 +51,7 @@ class RegistrationRepository {
     });
 
     return await _apiService.post<Map<String, dynamic>>(
-      Endpoints.selectUserType,
+      Endpoints.userType,
       body: formData,
       authMode: AuthMode.none,
     );

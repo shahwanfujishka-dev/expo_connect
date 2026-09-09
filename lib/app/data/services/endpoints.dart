@@ -1,9 +1,12 @@
 class Endpoints {
   static const String baseUrl = "https://fosgos.com/expo_connect";
+  static const String storageUrl = "$baseUrl/public/storage/";
+
+  // Auth
   static const String register = "/api/registration/register";
   static const String verifyOtp = "/api/registration/verify-otp";
   static const String resendOtp = "/api/registration/resend-otp";
-  static const String selectUserType = "/api/registration/user-type";
+  static const String userType = "/api/registration/user-type";
   static const String companyProfile = "/api/registration/company-profile";
   static const String visitorProfile = "/api/registration/user-profile";
   static const String login = "/api/auth/login";
@@ -22,6 +25,8 @@ class Endpoints {
   
   // Dashboard
   static const String dashboard = "/api/dashboard";
+  static const String visitorDashboard = "/api/visitor/dashboard";
+  static const String visitorExhibitorDetails = "/api/visitor/dashboard/show";
 
   // Leads
   static const String leads = "/api/lead";
@@ -34,6 +39,15 @@ class Endpoints {
 
   // Dropdowns
   static const String eventsDropdown = "/api/dropdown/events";
+
+  // Events
+  static const String upcomingExpos = "/api/event/upcoming";
+  static const String createEventWithHallStall = "/api/event/create-with-hall-stall";
+  static String eventHalls(int id) => "/api/event/$id/halls";
+  static String eventStalls(int hallId) => "/api/event/$hallId/stalls";
+  static const String joinEvent = "/api/event/join";
+  static String joinedEventDetails(int id) => "/api/event/$id/joined-details";
+  static String updateEventDetails(int id) => "/api/event/$id/update-details";
 
   // Connect timeout
   static const int connectionTimeout = 30000;

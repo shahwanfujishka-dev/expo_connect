@@ -22,10 +22,13 @@ import 'package:expo_connect/app/modules/Visitor/discover/view/visitor_discover_
 import 'package:expo_connect/app/modules/signUp/binding/signUp_binding.dart';
 import 'package:expo_connect/app/modules/signUp/signUp_Screen.dart';
 import 'package:get/get.dart';
-
 import '../modules/Exhibitor/ExhibitorNav/ExhibitorMainScreen.dart';
 import '../modules/Exhibitor/ExhibitorNav/ExhibitorNavBinding.dart';
 import '../modules/Exhibitor/business_card/binding/business_card_binding.dart';
+import '../modules/Exhibitor/events/binding/events_binding.dart';
+import '../modules/Exhibitor/events/views/add_event_screen.dart';
+import '../modules/Exhibitor/events/views/event_details_screen.dart';
+import '../modules/Exhibitor/events/views/events_view.dart';
 import '../modules/Exhibitor/exhibitor_profile/binding/exhibitor_profile_binding.dart';
 import '../modules/Exhibitor/leads_save_screen/binding/leads_save_binding.dart';
 import '../modules/Exhibitor/leads_screen/lead_pipeline/binding/lead_pipeline_binding.dart';
@@ -168,6 +171,21 @@ class AppPages {
       name: Routes.TEAM_DETAILS,
       page: () => const SalesPersonDetailsScreen(),
       binding: SalesPersonDetailsBinding(),
+    ),
+    GetPage(
+      name: Routes.EXHIBITOR_EVENTS,
+      page: () => const EventsView(),
+      binding: EventsBinding(),
+    ),
+    GetPage(
+      name: Routes.ADD_EVENT,
+      page: () => const AddEventScreen(),
+      binding: EventsBinding(),
+    ),
+    GetPage(
+      name: Routes.EVENT_DETAILS,
+      page: () => const EventDetailsScreen(),
+      binding: EventsBinding(),
     ),
 
     // Visitor Pages

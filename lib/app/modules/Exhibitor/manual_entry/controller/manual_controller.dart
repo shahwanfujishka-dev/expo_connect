@@ -1,10 +1,10 @@
-import 'package:expo_connect/app/data/providers/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../data/repositories/lead_repository.dart';
 import '../../../../routes/app_routes.dart';
 import '../../exhibitor_appbar/controller/event_dropdown_controller.dart';
+import '../../dashboard/controller/dashBoard_controller.dart';
 
 class ManualEntryController extends GetxController {
   final LeadRepository _leadRepository = LeadRepository();
@@ -20,15 +20,44 @@ class ManualEntryController extends GetxController {
 
   final isSaving = false.obs;
   final errorText = RxnString();
+  
+  // Default source is 'manual'
+  String source = 'manual';
+
+  String get title {
+    if (source == 'qr') return 'QR Lead Scan';
+    if (source == 'card_scan') return 'Card Lead Scan';
+    return 'Manual Entry';
+  }
 
   @override
   void onInit() {
     super.onInit();
+    _fillFromArguments();
     // Add listeners to clear errors when user types
     nameController.addListener(_clearError);
     emailController.addListener(_clearError);
     phoneController.addListener(_clearError);
     companyNameController.addListener(_clearError);
+  }
+
+  void _fillFromArguments() {
+    if (Get.arguments != null && Get.arguments is Map) {
+      final Map args = Get.arguments;
+      nameController.text = args['name']?.toString() ?? '';
+      emailController.text = args['email']?.toString() ?? '';
+      phoneController.text = args['phone']?.toString() ?? '';
+      whatsappController.text = args['whatsapp']?.toString() ?? '';
+      designationController.text = args['designation']?.toString() ?? '';
+      companyNameController.text = args['company_name']?.toString() ?? '';
+      addressController.text = args['address']?.toString() ?? '';
+      websiteController.text = args['website']?.toString() ?? '';
+      
+      // Update source if passed in arguments
+      if (args.containsKey('source')) {
+        source = args['source'].toString();
+      }
+    }
   }
 
   void _clearError() {
@@ -73,6 +102,7 @@ class ManualEntryController extends GetxController {
         address: addressController.text.trim(),
         companyName: companyNameController.text.trim(),
         designation: designationController.text.trim(),
+        source: source,
       );
 
       isSaving.value = false;
@@ -84,15 +114,16 @@ class ManualEntryController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green.withOpacity(0.8),
           colorText: Colors.white,
+          duration: const Duration(seconds: 2),
         );
 
-        Get.toNamed(
-          Routes.LEAD_SAVED,
-          arguments: {
-            'name': nameController.text.trim(),
-            'assignedTo': 'You',
-          },
-        );
+        // Refresh dashboard data if controller exists
+        if (Get.isRegistered<DashboardController>()) {
+          Get.find<DashboardController>().loadDashboard();
+        }
+
+        // Navigate back to dashboard and clear stack
+        Get.offAllNamed(Routes.EXHIBITOR_MAIN); // Using EXHIBITOR_MAIN as it usually contains the dashboard with nav
       } else {
         // Robust Error Parsing
         final dynamic errorData = result.data ?? result.error?.data;

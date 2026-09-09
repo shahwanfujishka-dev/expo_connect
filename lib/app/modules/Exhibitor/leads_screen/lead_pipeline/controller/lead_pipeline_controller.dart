@@ -39,6 +39,7 @@ class LeadPipelineController extends GetxController {
         return Lead(
           id: json['id'].toString(),
           name: json['name'] ?? '',
+          status_name:json['status_name']??'',
           title: json['designation'] ?? '',
           company: json['company_name'] ?? '',
           temperature: _mapStatusToTemperature(json['status']),

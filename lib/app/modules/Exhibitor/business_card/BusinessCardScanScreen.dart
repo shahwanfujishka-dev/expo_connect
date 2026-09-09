@@ -167,6 +167,8 @@ class _ExtractedFields extends StatelessWidget {
           SizedBox(height: 14.h),
           _ReadRow(label: 'Name', controller: controller.nameController),
           SizedBox(height: 10.h),
+          _ReadRow(label: 'Email', controller: controller.emailController),
+          SizedBox(height: 10.h),
           _ReadRow(label: 'Company', controller: controller.companyController),
           SizedBox(height: 10.h),
           _ReadRow(label: 'Phone', controller: controller.phoneController),

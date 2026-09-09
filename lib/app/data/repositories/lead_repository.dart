@@ -16,6 +16,7 @@ class LeadRepository {
     required String address,
     required String companyName,
     required String designation,
+    required String source,
   }) async {
     final formData = dio.FormData.fromMap({
       'expo_id': expoId,
@@ -27,6 +28,7 @@ class LeadRepository {
       'address': address,
       'company_name': companyName,
       'designation': designation,
+      'source': source,
     });
 
     return await _apiService.post<Map<String, dynamic>>(

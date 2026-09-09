@@ -12,6 +12,8 @@ class BusinessCardScanController extends GetxController {
   final nameController = TextEditingController();
   final companyController = TextEditingController();
   final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+
   final isSaving = false.obs;
   final errorText = RxnString();
   CameraController? cameraController;
@@ -41,6 +43,7 @@ class BusinessCardScanController extends GetxController {
   }
 
   bool get hasResult => state.value == CardScanState.done;
+
   Future<void> captureAndReadTapped() async {
     if (cameraController == null || !cameraController!.value.isInitialized) return;
     state.value = CardScanState.reading;
@@ -51,13 +54,28 @@ class BusinessCardScanController extends GetxController {
       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
       String fullText = recognizedText.text;
       List<String> lines = fullText.split('\n');
+
       if (lines.isNotEmpty) {
-        nameController.text = lines[0];
-        if (lines.length > 1) companyController.text = lines[1];
+        // Simple heuristic: First line is usually the name
+        nameController.text = lines[0].trim();
+
+        // Try to find company name (often 2nd line)
+        if (lines.length > 1) {
+          companyController.text = lines[1].trim();
+        }
+
+        // Extract Phone
         final phoneRegex = RegExp(r'(\+?\d[\d\-\s]{8,})');
-        final match = phoneRegex.firstMatch(fullText);
-        if (match != null) {
-          phoneController.text = match.group(0) ?? "";
+        final phoneMatch = phoneRegex.firstMatch(fullText);
+        if (phoneMatch != null) {
+          phoneController.text = phoneMatch.group(0)?.trim() ?? "";
+        }
+
+        // Extract Email
+        final emailRegex = RegExp(r"([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)");
+        final emailMatch = emailRegex.firstMatch(fullText);
+        if (emailMatch != null) {
+          emailController.text = emailMatch.group(0)?.trim() ?? "";
         }
       }
       state.value = CardScanState.done;
@@ -68,15 +86,15 @@ class BusinessCardScanController extends GetxController {
   }
 
   Future<void> confirmDetailsTapped() async {
-    if (isSaving.value) return;
-    isSaving.value = true;
-    await Future.delayed(const Duration(milliseconds: 500));
-    isSaving.value = false;
+    // Navigate to Manual Entry with extracted data
     Get.toNamed(
-      Routes.LEAD_SAVED,
+      Routes.MANUAL_ENTRY,
       arguments: {
         'name': nameController.text.trim(),
-        'assignedTo': 'You',
+        'company_name': companyController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'email': emailController.text.trim(),
+        'source': 'card_scan',
       },
     );
   }
@@ -86,6 +104,7 @@ class BusinessCardScanController extends GetxController {
     nameController.clear();
     companyController.clear();
     phoneController.clear();
+    emailController.clear();
   }
 
   @override
@@ -95,6 +114,7 @@ class BusinessCardScanController extends GetxController {
     nameController.dispose();
     companyController.dispose();
     phoneController.dispose();
+    emailController.dispose();
     super.onClose();
   }
 }

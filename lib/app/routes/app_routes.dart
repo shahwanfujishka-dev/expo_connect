@@ -21,6 +21,9 @@ abstract class Routes {
   static const SETTINGS = '/settings';
   static const TEAM = '/team';
   static const TEAM_DETAILS = '/team_details';
+  static const EXHIBITOR_EVENTS = '/exhibitor_events';
+  static const ADD_EVENT = '/add_event';
+  static const EVENT_DETAILS = '/event_details';
 
   // Visitor Routes
   static const VISITOR_MAIN = '/visitor_main';
