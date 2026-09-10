@@ -6,11 +6,11 @@ class VisitorAppBar extends StatelessWidget implements PreferredSizeWidget {
   const VisitorAppBar({
     super.key,
     required this.title,
-    // required this.onMenuTap,
+    this.onMenuTap,
   });
 
   final String title;
-  // final VoidCallback onMenuTap;
+  final VoidCallback? onMenuTap;
 
   @override
   Size get preferredSize => Size.fromHeight(64.h);
@@ -25,12 +25,15 @@ class VisitorAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       titleSpacing: 20.w,
       title: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // _SquareIconButton(
-          //   icon: Icons.menu_rounded,
-          //   onTap: onMenuTap,
-          // ),
+          _SquareIconButton(
+            icon: Icons.menu_rounded,
+            onTap: onMenuTap ??
+                    () {
+                  Scaffold.of(context).openDrawer();
+                },
+          ),
+          SizedBox(width: 12.w),
           Text(
             title,
             style: AppTextStyles.heading,

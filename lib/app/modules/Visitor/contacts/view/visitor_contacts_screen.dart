@@ -8,6 +8,7 @@ import '../../../../data/services/endpoints.dart';
 import '../../../../routes/app_routes.dart';
 import '../controller/visitor_contacts_controller.dart';
 import '../../visitor_main/controller/visitor_main_controller.dart';
+import '../../visitor_appbar/VisitorAppBar.dart';
 
 class VisitorContactsScreen extends GetView<VisitorContactsController> {
   const VisitorContactsScreen({super.key});
@@ -18,33 +19,9 @@ class VisitorContactsScreen extends GetView<VisitorContactsController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        title: Padding(
-          padding: EdgeInsets.only(left: 4.w),
-          child: Text(
-            'My contact book',
-            style: AppTextStyles.heading,
-          ),
-        ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: mainController.toggleDrawer,
-        //     icon: Container(
-        //       padding: EdgeInsets.all(8.r),
-        //       decoration: BoxDecoration(
-        //         color: AppColors.surface,
-        //         borderRadius: BorderRadius.circular(10.r),
-        //         border: Border.all(color: AppColors.border),
-        //       ),
-        //       child: Icon(Icons.menu_rounded, color: AppColors.primary, size: 20.sp),
-        //     ),
-        //   ),
-        //   SizedBox(width: 16.w),
-        // ],
+      appBar: VisitorAppBar(
+        title: 'My contact book',
+        onMenuTap: mainController.toggleDrawer,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,16 +125,17 @@ class _ContactTile extends GetView<VisitorContactsController> {
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => Get.toNamed(
-                  Routes.VISITOR_EXHIBITOR_DETAILS,
-                  arguments: exhibitor,
-                ),
-                child: Container(
+      child: InkWell(
+        onTap: () => Get.toNamed(
+          Routes.VISITOR_CONTACT_DETAILS,
+          arguments: exhibitor,
+        )?.then((_) => controller.fetchContacts()),
+        borderRadius: BorderRadius.circular(14.r),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
                   width: 48.r,
                   height: 48.r,
                   decoration: BoxDecoration(
@@ -168,21 +146,15 @@ class _ContactTile extends GetView<VisitorContactsController> {
                     borderRadius: BorderRadius.circular(10.r),
                     child: logoUrl != null
                         ? Image.network(
-                            logoUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _buildInitial(),
-                          )
+                      logoUrl,
+                      fit: BoxFit.fitWidth,
+                      errorBuilder: (_, __, ___) => _buildInitial(),
+                    )
                         : _buildInitial(),
                   ),
                 ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => Get.toNamed(
-                    Routes.VISITOR_EXHIBITOR_DETAILS,
-                    arguments: exhibitor,
-                  ),
+                SizedBox(width: 12.w),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -221,47 +193,47 @@ class _ContactTile extends GetView<VisitorContactsController> {
                     ],
                   ),
                 ),
-              ),
-              IconButton(
-                onPressed: () => controller.toggleFavorite(exhibitor),
-                icon: Icon(
-                  exhibitor.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                  color: exhibitor.isFavorite ? Colors.red : AppColors.textSecondary,
-                  size: 22.sp,
+                IconButton(
+                  onPressed: () => controller.toggleFavorite(exhibitor),
+                  icon: Icon(
+                    exhibitor.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    color: exhibitor.isFavorite ? Colors.red : AppColors.textSecondary,
+                    size: 22.sp,
+                  ),
                 ),
-              ),
-              _buildMoreOptions(context),
-            ],
-          ),
-          if (exhibitor.notes != null && exhibitor.notes!.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(top: 8.h),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(8.r),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.notes, size: 14.sp, color: AppColors.textSecondary),
-                    SizedBox(width: 6.w),
-                    Expanded(
-                      child: Text(
-                        exhibitor.notes!,
-                        style: AppTextStyles.caption.copyWith(fontStyle: FontStyle.italic),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                _buildMoreOptions(context),
+              ],
             ),
-        ],
+            if (exhibitor.notes != null && exhibitor.notes!.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: 8.h),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.notes, size: 14.sp, color: AppColors.textSecondary),
+                      SizedBox(width: 6.w),
+                      Expanded(
+                        child: Text(
+                          exhibitor.notes!,
+                          style: AppTextStyles.caption.copyWith(fontStyle: FontStyle.italic),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

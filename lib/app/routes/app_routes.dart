@@ -20,6 +20,8 @@ abstract class Routes {
   static const MY_PROFILE = '/my_profile';
   static const SETTINGS = '/settings';
   static const TEAM = '/team';
+  static const BROCHURE = '/brochure';
+  static const ADD_BROCHURE = '/add_brochure';
   static const TEAM_DETAILS = '/team_details';
   static const EXHIBITOR_EVENTS = '/exhibitor_events';
   static const ADD_EVENT = '/add_event';
@@ -37,4 +39,5 @@ abstract class Routes {
   static const VISITOR_COMPARE = '/visitor_compare';
   static const VISITOR_FOLLOW_UP = '/visitor_follow_up';
   static const VISITOR_DIGITAL_CARD = '/visitor_digital_card';
+  static const VISITOR_CONTACT_DETAILS = '/visitor_contact_details';
 }

@@ -5,6 +5,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../routes/app_routes.dart';
 import '../controller/visitor_plan_controller.dart';
 import '../../visitor_main/controller/visitor_main_controller.dart';
+import '../../visitor_appbar/VisitorAppBar.dart';
 
 class VisitorPlanScreen extends GetView<VisitorPlanController> {
   const VisitorPlanScreen({super.key});
@@ -12,33 +13,12 @@ class VisitorPlanScreen extends GetView<VisitorPlanController> {
   @override
   Widget build(BuildContext context) {
     final mainController = Get.find<VisitorMainController>();
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'My expo plan',
-          style: AppTextStyles.heading,
-        ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: mainController.toggleDrawer,
-        //     icon: Container(
-        //       padding: EdgeInsets.all(8.r),
-        //       decoration: BoxDecoration(
-        //         color: AppColors.surface,
-        //         borderRadius: BorderRadius.circular(10.r),
-        //         border: Border.all(color: AppColors.border),
-        //       ),
-        //       child: Icon(Icons.menu_rounded, color: AppColors.primary, size: 20.sp),
-        //     ),
-        //   ),
-        //   SizedBox(width: 12.w),
-        // ],
+      appBar: VisitorAppBar(
+        title: 'My expo plan',
+        onMenuTap: mainController.toggleDrawer,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../controller/visitor_profile_controller.dart';
 import '../../visitor_main/controller/visitor_main_controller.dart';
+import '../../visitor_appbar/VisitorAppBar.dart';
 
 class VisitorProfileScreen extends GetView<VisitorProfileController> {
   const VisitorProfileScreen({super.key});
@@ -14,33 +15,9 @@ class VisitorProfileScreen extends GetView<VisitorProfileController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        title: Padding(
-          padding: EdgeInsets.only(left: 4.w),
-          child: Text(
-            'My digital card',
-            style: AppTextStyles.heading,
-          ),
-        ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: mainController.toggleDrawer,
-        //     icon: Container(
-        //       padding: EdgeInsets.all(8.r),
-        //       decoration: BoxDecoration(
-        //         color: AppColors.surface,
-        //         borderRadius: BorderRadius.circular(10.r),
-        //         border: Border.all(color: AppColors.border),
-        //       ),
-        //       child: Icon(Icons.menu_rounded, color: AppColors.primary, size: 20.sp),
-        //     ),
-        //   ),
-        //   SizedBox(width: 16.w),
-        // ],
+      appBar: VisitorAppBar(
+        title: 'My digital card',
+        onMenuTap: mainController.toggleDrawer,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

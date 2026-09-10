@@ -24,7 +24,6 @@ class DashboardScreen extends GetView<DashboardController> {
       body: SafeArea(
         top: false,
         child: Obx(() {
-          // Check for loading or null stats to avoid force-unwrap error
           if (controller.isLoading.value || controller.stats.value == null) {
             return const _DashboardShimmer();
           }
@@ -134,7 +133,6 @@ class _DashboardShimmer extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          // Good morning shimmer
           Container(
             width: 80.w,
             height: 14.h,
@@ -153,8 +151,6 @@ class _DashboardShimmer extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-
-          // Stat Cards shimmer
           Row(
             children: List.generate(3, (index) => Expanded(
               child: Container(
@@ -168,8 +164,6 @@ class _DashboardShimmer extends StatelessWidget {
             )),
           ),
           SizedBox(height: 16.h),
-
-          // Action Chips shimmer
           Row(
             children: List.generate(3, (index) => Expanded(
               child: Container(
@@ -183,8 +177,6 @@ class _DashboardShimmer extends StatelessWidget {
             )),
           ),
           SizedBox(height: 24.h),
-
-          // Recent Leads Header shimmer
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -207,8 +199,6 @@ class _DashboardShimmer extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12.h),
-
-          // Lead Tiles shimmer
           ...List.generate(4, (index) => Container(
             margin: EdgeInsets.only(bottom: 10.h),
             padding: EdgeInsets.all(12.r),
@@ -365,22 +355,20 @@ class _LeadTile extends StatelessWidget {
   const _LeadTile({required this.lead});
   final Lead lead;
 
-  Color _tagColor() {
-    switch (lead.temperature) {
-      case LeadTemperature.hot:
-        return AppColors.error;
-      case LeadTemperature.warm:
-        return const Color(0xFFB98A1E);
-      case LeadTemperature.cold:
-        return AppColors.textSecondary;
-      case LeadTemperature.newLead:
-        return AppColors.primary;
+  Color _getStatusColor() {
+    if (lead.status_color != null && lead.status_color!.isNotEmpty) {
+      try {
+        return Color(int.parse(lead.status_color!.replaceFirst('#', '0xff')));
+      } catch (e) {
+        // Fallback
+      }
     }
+    return AppColors.primary;
   }
 
   @override
   Widget build(BuildContext context) {
-    final tagColor = _tagColor();
+    final statusColor = _getStatusColor();
 
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.LEAD_DETAILS, arguments: lead),
@@ -398,7 +386,7 @@ class _LeadTile extends StatelessWidget {
               radius: 18.r,
               backgroundColor: AppColors.primarySoft,
               child: Text(
-                lead.name.isNotEmpty ? lead.name[0] : '?',
+                lead.name.isNotEmpty ? lead.name[0].toUpperCase() : '?',
                 style: TextStyle(
                     color: AppColors.primaryDark,
                     fontWeight: FontWeight.w700,
@@ -437,12 +425,12 @@ class _LeadTile extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               decoration: BoxDecoration(
-                color: tagColor.withOpacity(0.12),
+                color: statusColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
-                lead.status_name,
-                style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700, color: tagColor),
+                lead.status_name.isNotEmpty ? lead.status_name : 'New',
+                style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700, color: statusColor),
               ),
             ),
           ],

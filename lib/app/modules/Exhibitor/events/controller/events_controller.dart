@@ -167,10 +167,10 @@ class EventsController extends GetxController {
   }
 
   void toggleCreateNew() {
+    _clearFields();
     isCreatingNewEvent.value = true;
     selectedUpcomingEvent.value = null;
     expoId.value = null;
-    _clearFields();
   }
 
   void cancelCreateNew() {

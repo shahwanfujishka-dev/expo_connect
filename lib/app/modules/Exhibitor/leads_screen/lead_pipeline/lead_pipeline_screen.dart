@@ -70,39 +70,60 @@ class LeadPipelineScreen extends GetView<LeadPipelineController> {
   }
 
   Widget _buildFilterRow() {
-    final filters = ['All', 'Hot', 'Warm', 'Cold', 'New'];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Obx(() => Row(
-            children: filters.map((f) {
-              final isSelected = controller.selectedFilter.value == f;
-              final count = controller.getCount(f);
-              return GestureDetector(
-                onTap: () => controller.applyFilter(f),
-                child: Container(
-                  margin: EdgeInsets.only(right: 8.w),
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : AppColors.surface,
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.border,
-                      width: 1.w,
-                    ),
-                  ),
-                  child: Text(
-                    '$f $count',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : AppColors.textSecondary,
-                    ),
-                  ),
-                ),
+    return Obx(() {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Row(
+          children: [
+            _buildFilterItem(
+              label: 'All',
+              isSelected: controller.selectedStatusId.value == null,
+              count: controller.getStatusCount(null),
+              onTap: () => controller.filterByStatus(null),
+            ),
+            ...controller.statuses.map((status) {
+              return _buildFilterItem(
+                label: status.name,
+                isSelected: controller.selectedStatusId.value == status.id,
+                count: controller.getStatusCount(status.id),
+                onTap: () => controller.filterByStatus(status.id),
               );
-            }).toList(),
-          )),
+            }),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildFilterItem({
+    required String label,
+    required bool isSelected,
+    required int count,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(right: 8.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: 1.w,
+          ),
+        ),
+        child: Text(
+          '$label $count',
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -135,25 +156,27 @@ class _LeadPipelineTile extends StatelessWidget {
   const _LeadPipelineTile({required this.lead});
   final Lead lead;
 
-  Color _tagColor() {
-    switch (lead.temperature) {
-      case LeadTemperature.hot:
-        return AppColors.error;
-      case LeadTemperature.warm:
-        return const Color(0xFFB98A1E);
-      case LeadTemperature.cold:
-        return AppColors.textSecondary;
-      case LeadTemperature.newLead:
-        return AppColors.primary;
+  Color _getStatusColor() {
+    if (lead.status_color != null && lead.status_color!.isNotEmpty) {
+      try {
+        return Color(int.parse(lead.status_color!.replaceFirst('#', '0xff')));
+      } catch (e) {
+        // Fallback
+      }
     }
+    return AppColors.primary;
   }
 
   @override
   Widget build(BuildContext context) {
-    final tagColor = _tagColor();
+    final statusColor = _getStatusColor();
     final initials = lead.name.isNotEmpty 
         ? lead.name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
         : '?';
+    
+    final String statusLabel = lead.status_name.isNotEmpty 
+        ? lead.status_name 
+        : 'New';
 
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.LEAD_DETAILS, arguments: lead),
@@ -198,15 +221,15 @@ class _LeadPipelineTile extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
               decoration: BoxDecoration(
-                color: tagColor.withOpacity(0.12),
+                color: statusColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Text(
-                lead.temperature.label,
+                statusLabel,
                 style: TextStyle(
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w700,
-                  color: tagColor,
+                  color: statusColor,
                 ),
               ),
             ),

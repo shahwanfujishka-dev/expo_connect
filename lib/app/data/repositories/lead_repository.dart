@@ -195,4 +195,37 @@ class LeadRepository {
       authMode: AuthMode.header,
     );
   }
+
+  Future<ApiResult<Map<String, dynamic>>> getLeadStatuses() async {
+    return await _apiService.get<Map<String, dynamic>>(
+      Endpoints.leadStatusDropdown,
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> getSalesPersons() async {
+    return await _apiService.get<Map<String, dynamic>>(
+      Endpoints.salesPersonsDropdown,
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> updateLeadStatus(String leadId, int statusId) async {
+    return await _apiService.patch<Map<String, dynamic>>(
+      "${Endpoints.leads}/$leadId/status?lead_status_id=$statusId",
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> assignSalesPerson(String leadId, int salesPersonId) async {
+    // final formData = dio.FormData.fromMap({
+    //   'sales_person_id': salesPersonId,
+    // });
+
+    return await _apiService.patch<Map<String, dynamic>>(
+      "${Endpoints.leads}/$leadId/assign?assigned_to=$salesPersonId",
+      // body: formData,
+      authMode: AuthMode.header,
+    );
+  }
 }

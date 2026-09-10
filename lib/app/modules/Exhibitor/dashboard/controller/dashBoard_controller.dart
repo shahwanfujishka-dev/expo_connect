@@ -73,9 +73,10 @@ class DashboardController extends GetxController {
             id: json['id'].toString(),
             name: json['name'] ?? '',
             status_name: json['status_name'] ?? '',
+            status_color: json['status_color'],
+            status_id: json['status'],
             title: json['designation'] ?? '',
             company: json['company_name'] ?? '',
-            temperature: _mapStatusToTemperature(json['status']),
           );
         }).toList());
       }
@@ -84,11 +85,6 @@ class DashboardController extends GetxController {
     }
 
     isLoading.value = false;
-  }
-
-  LeadTemperature _mapStatusToTemperature(dynamic status) {
-    if (status == 1) return LeadTemperature.hot;
-    return LeadTemperature.newLead;
   }
 
   void onNavTap(int index) {

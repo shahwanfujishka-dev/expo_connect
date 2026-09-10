@@ -94,4 +94,21 @@ class VisitorRepository {
       authMode: AuthMode.header,
     );
   }
+
+  Future<ApiResult<Map<String, dynamic>>> saveBrochure(int brochureId) async {
+    return await _apiService.post<Map<String, dynamic>>(
+      Endpoints.visitorSaveBrochure,
+      body: {
+        'brochure_id': brochureId,
+      },
+      authMode: AuthMode.header,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> deleteBrochure(int brochureId) async {
+    return await _apiService.delete<Map<String, dynamic>>(
+      Endpoints.visitorDeleteBrochure(brochureId),
+      authMode: AuthMode.header,
+    );
+  }
 }

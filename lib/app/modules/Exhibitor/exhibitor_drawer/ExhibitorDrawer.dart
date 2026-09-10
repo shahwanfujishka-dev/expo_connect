@@ -82,6 +82,14 @@ class ExhibitorDrawer extends GetView<ExhibitorNavController> {
                             Get.toNamed(Routes.TEAM);
                           },
                         ),
+                        _DrawerTile(
+                          icon: Icons.book_online_outlined,
+                          label: 'Brochure',
+                          onTap: () {
+                            onClose();
+                            Get.toNamed(Routes.BROCHURE);
+                          },
+                        ),
                         SizedBox(height: 20.h),
                         const _SectionLabel('ACCOUNT'),
                         SizedBox(height: 8.h),

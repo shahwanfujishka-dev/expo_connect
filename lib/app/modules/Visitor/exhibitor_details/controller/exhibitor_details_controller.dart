@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../../../data/models/exhibitor_model.dart';
 import '../../../../data/repositories/visitor_repository.dart';
 import '../../../../data/services/endpoints.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VisitorExhibitorDetailsController extends GetxController {
   final VisitorRepository repository;
@@ -11,6 +12,7 @@ class VisitorExhibitorDetailsController extends GetxController {
   final companyDetails = <String, dynamic>{}.obs;
   final isLoading = false.obs;
   final isFavorite = false.obs;
+  final isBrochuresExpanded = false.obs;
 
   @override
   void onInit() {
@@ -56,9 +58,9 @@ class VisitorExhibitorDetailsController extends GetxController {
       if (result.success) {
         isFavorite.value = !isFavorite.value;
         Get.snackbar(
-          "Success", 
-          isFavorite.value 
-              ? "${initialExhibitor.name} added to your plan" 
+          "Success",
+          isFavorite.value
+              ? "${initialExhibitor.name} added to your plan"
               : "${initialExhibitor.name} removed from your plan"
         );
       } else {
@@ -69,7 +71,45 @@ class VisitorExhibitorDetailsController extends GetxController {
     }
   }
 
-  void downloadBrochure() {
-    Get.snackbar("Downloading", "Brochure download started...");
+  void toggleBrochures() {
+    isBrochuresExpanded.value = !isBrochuresExpanded.value;
+  }
+
+  Future<void> openBrochure(String filePath) async {
+    if (filePath.isEmpty) return;
+    final url = Uri.parse("${Endpoints.storageUrl}$filePath");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar("Error", "Could not open brochure");
+    }
+  }
+
+  Future<void> saveBrochure(int brochureId) async {
+    try {
+      final result = await repository.saveBrochure(brochureId);
+      if (result.success) {
+        Get.snackbar("Success", "Brochure saved successfully");
+        fetchExhibitorDetails(); // Refresh to update saved state if available
+      } else {
+        Get.snackbar("Error", result.error?.message ?? "Failed to save brochure");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    }
+  }
+
+  Future<void> deleteBrochure(int brochureId) async {
+    try {
+      final result = await repository.deleteBrochure(brochureId);
+      if (result.success) {
+        Get.snackbar("Success", "Brochure removed from saved");
+        fetchExhibitorDetails(); // Refresh to update saved state
+      } else {
+        Get.snackbar("Error", result.error?.message ?? "Failed to remove brochure");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong: $e");
+    }
   }
 }

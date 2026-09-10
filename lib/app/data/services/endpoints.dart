@@ -37,6 +37,10 @@ class Endpoints {
   static const String visitorContactNotes = "/api/visitor/contact-book/notes";
   static String visitorDeleteContact(int id) => "/api/visitor/contact-book/$id";
 
+  // Brochures
+  static const String visitorSaveBrochure = "/api/visitor/brochures";
+  static String visitorDeleteBrochure(int id) => "/api/visitor/brochures/$id";
+
   // Leads
   static const String leads = "/api/lead";
   static const String leadShow = "/api/lead/show"; // Needs ID suffix
@@ -48,6 +52,8 @@ class Endpoints {
 
   // Dropdowns
   static const String eventsDropdown = "/api/dropdown/events";
+  static const String leadStatusDropdown = "/api/dropdown/lead-status";
+  static const String salesPersonsDropdown = "/api/dropdown/sales-persons";
 
   // Events
   static const String upcomingExpos = "/api/event/upcoming";

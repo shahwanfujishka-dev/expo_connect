@@ -1,6 +1,7 @@
 import 'package:expo_connect/app/modules/Exhibitor/exhibitor_profile/my_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../visitor_drawer/VisitorDrawer.dart';
 import '../controller/visitor_main_controller.dart';
 import '../widgets/visitor_bottom_nav.dart';
 import '../../discover/view/visitor_discover_screen.dart';
@@ -14,20 +15,36 @@ class VisitorMainScreen extends GetView<VisitorMainController> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => Scaffold(
-        body: IndexedStack(
-          index: controller.currentIndex.value,
-          children: const [
-            VisitorDiscoverScreen(),
-            VisitorPlanScreen(),
-            SizedBox.shrink(), // Placeholder for Scan (handled via navigation in controller)
-            VisitorContactsScreen(),
-            MyProfileScreen(),
+          () => PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          await controller.handleBackPress();
+        },
+        child: Stack(
+          children: [
+            Scaffold(
+              body: IndexedStack(
+                index: controller.currentIndex.value,
+                children: const [
+                  VisitorDiscoverScreen(),
+                  VisitorPlanScreen(),
+                  SizedBox.shrink(), // Placeholder for Scan
+                  VisitorContactsScreen(),
+                  MyProfileScreen(),
+                ],
+              ),
+              bottomNavigationBar: VisitorBottomNav(
+                currentIndex: controller.currentIndex.value,
+                onTap: controller.changePage,
+              ),
+            ),
+            VisitorDrawer(
+              isOpen: controller.isDrawerOpen.value,
+              onClose: controller.closeDrawer,
+              onLogout: controller.logout,
+            ),
           ],
-        ),
-        bottomNavigationBar: VisitorBottomNav(
-          currentIndex: controller.currentIndex.value,
-          onTap: controller.changePage,
         ),
       ),
     );

@@ -6,8 +6,8 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../data/models/exhibitor_model.dart';
 import '../../../../routes/app_routes.dart';
 import '../../visitor_appbar/VisitorAppBar.dart';
-import '../controller/visitor_discover_controller.dart';
 import '../../visitor_main/controller/visitor_main_controller.dart';
+import '../controller/visitor_discover_controller.dart';
 
 class VisitorDiscoverScreen extends GetView<VisitorDiscoverController> {
   const VisitorDiscoverScreen({super.key});
@@ -15,12 +15,12 @@ class VisitorDiscoverScreen extends GetView<VisitorDiscoverController> {
   @override
   Widget build(BuildContext context) {
     final mainController = Get.find<VisitorMainController>();
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: VisitorAppBar(
         title: 'Discover exhibitors',
-        // onMenuTap: mainController.toggleDrawer,
+        onMenuTap: mainController.toggleDrawer,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +263,7 @@ class _CategoryFilters extends GetView<VisitorDiscoverController> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Obx(
-        () => Row(
+            () => Row(
           children: controller.categories.map((cat) {
             final isSelected = controller.selectedCategory.value == cat;
             return Padding(

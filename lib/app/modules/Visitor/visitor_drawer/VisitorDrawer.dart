@@ -44,7 +44,7 @@ class VisitorDrawer extends GetView<VisitorMainController> {
                 children: [
                   Obx(() => _DrawerHeader(
                     userName: controller.userName.value,
-                    userRole: controller.userRole.value,
+                    userEmail: controller.userEmail.value,
                     avatar: controller.userAvatar.value,
                     onClose: onClose,
                   )),
@@ -54,9 +54,9 @@ class VisitorDrawer extends GetView<VisitorMainController> {
                       physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.fromLTRB(12.w, 18.h, 12.w, 18.h),
                       children: [
-                        const _SectionLabel('EXPLORE'),
+                        const _SectionLabel('NAVIGATION'),
                         SizedBox(height: 8.h),
-                        Obx(() => _DrawerTile(
+                        _DrawerTile(
                           icon: Icons.explore_rounded,
                           label: 'Discover',
                           selected: controller.currentIndex.value == 0,
@@ -64,8 +64,8 @@ class VisitorDrawer extends GetView<VisitorMainController> {
                             onClose();
                             controller.changePage(0);
                           },
-                        )),
-                        Obx(() => _DrawerTile(
+                        ),
+                        _DrawerTile(
                           icon: Icons.event_note_rounded,
                           label: 'My Plan',
                           selected: controller.currentIndex.value == 1,
@@ -73,34 +73,34 @@ class VisitorDrawer extends GetView<VisitorMainController> {
                             onClose();
                             controller.changePage(1);
                           },
-                        )),
-                        Obx(() => _DrawerTile(
-                          icon: Icons.contact_phone_rounded,
+                        ),
+                        _DrawerTile(
+                          icon: Icons.contacts_rounded,
                           label: 'Contact Book',
                           selected: controller.currentIndex.value == 3,
                           onTap: () {
                             onClose();
                             controller.changePage(3);
                           },
-                        )),
+                        ),
                         SizedBox(height: 20.h),
                         const _SectionLabel('ACCOUNT'),
                         SizedBox(height: 8.h),
-                        Obx(() => _DrawerTile(
-                          icon: Icons.account_circle_outlined,
-                          label: 'Digital Card',
+                        _DrawerTile(
+                          icon: Icons.person_outline_rounded,
+                          label: 'My Profile',
                           selected: controller.currentIndex.value == 4,
                           onTap: () {
                             onClose();
                             controller.changePage(4);
                           },
-                        )),
+                        ),
                         _DrawerTile(
                           icon: Icons.settings_outlined,
                           label: 'Settings',
                           onTap: () {
                             onClose();
-                            Get.toNamed(Routes.SETTINGS);
+                            // Get.toNamed(Routes.SETTINGS);
                           },
                         ),
                       ],
@@ -167,13 +167,13 @@ class _Scrim extends StatelessWidget {
 class _DrawerHeader extends StatelessWidget {
   const _DrawerHeader({
     required this.userName,
-    required this.userRole,
+    required this.userEmail,
     this.avatar,
     required this.onClose,
   });
 
   final String userName;
-  final String userRole;
+  final String userEmail;
   final String? avatar;
   final VoidCallback onClose;
 
@@ -203,24 +203,13 @@ class _DrawerHeader extends StatelessWidget {
                   offset: Offset(0, 6.h),
                 ),
               ],
-              image: (avatar != null && avatar!.isNotEmpty)
-                  ? DecorationImage(
-                image: NetworkImage(
-                    '${Endpoints.baseUrl}/public/storage/$avatar'),
-                fit: BoxFit.cover,
-              )
-                  : null,
+              image: (avatar != null && avatar!.isNotEmpty) ? DecorationImage(image: NetworkImage('${Endpoints.baseUrl}/public/storage/$avatar'), fit: BoxFit.cover) : null,
             ),
             alignment: Alignment.center,
-            child: (avatar == null || avatar!.isEmpty)
-                ? Text(
+            child: (avatar == null || avatar!.isEmpty) ? Text(
               initial,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 19.sp,
-                  fontWeight: FontWeight.w800),
-            )
-                : null,
+              style: TextStyle(color: Colors.white, fontSize: 19.sp, fontWeight: FontWeight.w800),
+            ) : null,
           ),
           SizedBox(width: 13.w),
           Expanded(
@@ -231,12 +220,11 @@ class _DrawerHeader extends StatelessWidget {
                   userName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.body
-                      .copyWith(fontSize: 15.sp, fontWeight: FontWeight.w700),
+                  style: AppTextStyles.body.copyWith(fontSize: 15.sp, fontWeight: FontWeight.w700),
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  userRole,
+                  userEmail.isEmpty ? 'Visitor' : userEmail,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.caption.copyWith(fontSize: 12.sp),
@@ -346,8 +334,7 @@ class _DrawerTile extends StatelessWidget {
                 if (selected)
                   Padding(
                     padding: EdgeInsets.only(right: 10.w),
-                    child: Icon(Icons.chevron_right_rounded,
-                        size: 19.sp, color: AppColors.primaryDark),
+                    child: Icon(Icons.chevron_right_rounded, size: 19.sp, color: AppColors.primaryDark),
                   ),
               ],
             ),

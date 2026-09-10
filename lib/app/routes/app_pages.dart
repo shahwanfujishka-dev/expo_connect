@@ -1,5 +1,8 @@
 import 'package:expo_connect/app/modules/Exhibitor/QrScan/QrScanScreen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/QrScan/binding/qrScan_binding.dart';
+import 'package:expo_connect/app/modules/Exhibitor/brochure/binding/brochure_binding.dart';
+import 'package:expo_connect/app/modules/Exhibitor/brochure/view/add_brochure_screen.dart';
+import 'package:expo_connect/app/modules/Exhibitor/brochure/view/brochure_screen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/business_card/BusinessCardScanScreen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/dashboard/Dashboard_Screen.dart';
 import 'package:expo_connect/app/modules/Exhibitor/dashboard/binding/dashboard_binding.dart';
@@ -36,6 +39,8 @@ import '../modules/Exhibitor/leads_screen/lead_pipeline/lead_pipeline_screen.dar
 import '../modules/Exhibitor/manual_entry/binding/manual_entry_binding.dart';
 import '../modules/Visitor/complete_profile/binding/visitor_complete_profile_binding.dart';
 import '../modules/Visitor/complete_profile/view/visitor_complete_profile_screen.dart';
+import '../modules/Visitor/contact_details/binding/contact_details_binding.dart';
+import '../modules/Visitor/contact_details/view/contact_details_screen.dart';
 import '../modules/Visitor/discover/binding/visitor_discover_binding.dart';
 import '../modules/Visitor/exhibitor_details/binding/exhibitor_details_binding.dart';
 import '../modules/Visitor/exhibitor_details/view/exhibitor_details_screen.dart';
@@ -168,6 +173,16 @@ class AppPages {
       binding: SalesTeamBinding(),
     ),
     GetPage(
+      name: Routes.BROCHURE,
+      page: () => const BrochureScreen(),
+      binding: BrochureBinding(),
+    ),
+    GetPage(
+      name: Routes.ADD_BROCHURE,
+      page: () => const AddBrochureScreen(),
+      binding: BrochureBinding(),
+    ),
+    GetPage(
       name: Routes.TEAM_DETAILS,
       page: () => const SalesPersonDetailsScreen(),
       binding: SalesPersonDetailsBinding(),
@@ -208,6 +223,11 @@ class AppPages {
       name: Routes.VISITOR_DISCOVER,
       page: () => const VisitorDiscoverScreen(),
       binding: VisitorDiscoverBinding(),
+    ),
+    GetPage(
+      name: Routes.VISITOR_CONTACT_DETAILS,
+      page: () => const VisitorContactDetailsScreen(),
+      binding: VisitorContactDetailsBinding(),
     ),
   ];
 }

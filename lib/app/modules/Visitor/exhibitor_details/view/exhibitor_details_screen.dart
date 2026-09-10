@@ -23,6 +23,7 @@ class VisitorExhibitorDetailsScreen extends GetView<VisitorExhibitorDetailsContr
         final stall = company['stall'] ?? controller.initialExhibitor.booth;
         final category = company['category'] ?? controller.initialExhibitor.category;
         final description = company['description'] ?? controller.initialExhibitor.description;
+        final brochures = (company['brochures'] as List?) ?? [];
 
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -157,8 +158,8 @@ class VisitorExhibitorDetailsScreen extends GetView<VisitorExhibitorDetailsContr
                         SizedBox(width: 12.w),
                         _DetailActionButton(
                           icon: Icons.file_download_outlined,
-                          label: "Brochure",
-                          onPressed: controller.downloadBrochure,
+                          label: "Brochures",
+                          onPressed: controller.toggleBrochures,
                         ),
                         SizedBox(width: 12.w),
                         _DetailActionButton(
@@ -168,6 +169,86 @@ class VisitorExhibitorDetailsScreen extends GetView<VisitorExhibitorDetailsContr
                         ),
                       ],
                     ),
+
+                    // Brochures List
+                    Obx(() {
+                      if (controller.isBrochuresExpanded.value && brochures.isNotEmpty) {
+                        return Padding(
+                          padding: EdgeInsets.only(top: 24.h),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Brochures",
+                                  style: AppTextStyles.subheading.copyWith(fontWeight: FontWeight.w700)),
+                              SizedBox(height: 12.h),
+                              ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                itemCount: brochures.length,
+                                separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                                itemBuilder: (context, index) {
+                                  final brochure = brochures[index];
+                                  final title = brochure['title'] ?? "Brochure ${index + 1}";
+                                  final fileType = brochure['file_type'] ?? "file";
+                                  final isVideo = fileType == 'video';
+                                  final isSaved = brochure['is_saved'] ?? false;
+
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      side: const BorderSide(color: AppColors.border),
+                                    ),
+                                    tileColor: Colors.white,
+                                    leading: Container(
+                                      padding: EdgeInsets.all(8.r),
+                                      decoration: BoxDecoration(
+                                        color: isVideo ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        isVideo ? Icons.play_circle_outline : Icons.description_outlined,
+                                        color: isVideo ? Colors.red : Colors.blue,
+                                        size: 20.sp,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      title,
+                                      style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, fontSize: 13.sp),
+                                    ),
+                                    subtitle: Text(
+                                      fileType.toString().capitalizeFirst!,
+                                      style: AppTextStyles.caption.copyWith(fontSize: 11.sp),
+                                    ),
+                                    trailing: IconButton(
+                                      icon: Icon(
+                                        isSaved ? Icons.bookmark : Icons.bookmark_border_rounded,
+                                        size: 20.sp,
+                                        color: AppColors.primary,
+                                      ),
+                                      onPressed: () {
+                                        final brochureId = brochure['id'];
+                                        if (brochureId != null) {
+                                          if (isSaved) {
+                                            controller.deleteBrochure(brochureId);
+                                          } else {
+                                            controller.saveBrochure(brochureId);
+                                          }
+                                        }
+                                      },
+                                    ),
+                                    onTap: () => controller.openBrochure(brochure['file'] ?? ""),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+
                     SizedBox(height: 32.h),
 
                     // About

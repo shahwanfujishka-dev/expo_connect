@@ -24,16 +24,25 @@ class LeadDetailsScreen extends GetView<LeadDetailsController> {
         final initials = lead.name.isNotEmpty
             ? lead.name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
             : '?';
-        final tempColor = _getTemperatureColor(lead.temperature);
+            
+        // Use status_color and status_name from API
+        final Color statusColor = lead.status_color != null && lead.status_color!.isNotEmpty
+            ? Color(int.parse(lead.status_color!.replaceFirst('#', '0xff')))
+            : AppColors.primary;
+            
+        final String statusLabel = lead.status_name.isNotEmpty 
+            ? lead.status_name 
+            : 'New lead';
 
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            _buildAppBar(lead, initials, tempColor),
+            _buildAppBar(lead, initials, statusColor, statusLabel),
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
+                  _buildAssignmentSection(),
                   _buildQuickActions(),
                   SizedBox(height: 24.h),
                   _buildContactSection(lead),
@@ -51,7 +60,7 @@ class LeadDetailsScreen extends GetView<LeadDetailsController> {
     );
   }
 
-  Widget _buildAppBar(Lead lead, String initials, Color tempColor) {
+  Widget _buildAppBar(Lead lead, String initials, Color statusColor, String statusLabel) {
     return SliverAppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
@@ -153,7 +162,7 @@ class LeadDetailsScreen extends GetView<LeadDetailsController> {
                             ],
                           ),
                           SizedBox(height: 10.h),
-                          TemperatureTag(label: '${lead.temperature.label} lead', color: tempColor),
+                          TemperatureTag(label: statusLabel, color: statusColor),
                         ],
                       ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1),
                     ),
@@ -164,6 +173,105 @@ class LeadDetailsScreen extends GetView<LeadDetailsController> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAssignmentSection() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Obx(() => _buildDropdown<int>(
+                    label: "Status",
+                    value: controller.selectedStatusId.value,
+                    items: controller.leadStatuses
+                        .map((s) => DropdownMenuItem(
+                              value: s.id,
+                              child: Text(s.name, style: TextStyle(fontSize: 13.sp, color: Colors.black)),
+                            ))
+                        .toList(),
+                    onChanged: controller.updateStatus,
+                    isLoading: controller.isUpdatingStatus.value,
+                  )),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Obx(() => _buildDropdown<int>(
+                    label: "Assign To",
+                    value: controller.selectedSalesPersonId.value,
+                    items: controller.salesPersons
+                        .map((s) => DropdownMenuItem(
+                              value: s.id,
+                              child: Text(s.name, style: TextStyle(fontSize: 13.sp, color: Colors.black)),
+                            ))
+                        .toList(),
+                    onChanged: controller.assignSalesPerson,
+                    isLoading: controller.isAssigningSalesPerson.value,
+                  )),
+            ),
+          ],
+        ),
+        SizedBox(height: 20.h),
+      ],
+    ).animate().fadeIn(delay: 100.ms).moveY(begin: 10);
+  }
+
+  Widget _buildDropdown<T>({
+    required String label,
+    required T? value,
+    required List<DropdownMenuItem<T>> items,
+    required Function(T?) onChanged,
+    required bool isLoading,
+  }) {
+    final T? safeValue = items.any((item) => item.value == value) ? value : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: AppTextStyles.caption.copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textSecondary,
+            letterSpacing: 0.5,
+          ),
+        ),
+        SizedBox(height: 6.h),
+        Container(
+          height: 48.h,
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<T>(
+              value: safeValue,
+              items: items,
+              onChanged: isLoading ? null : onChanged,
+              isExpanded: true,
+              hint: Text("Select", style: TextStyle(fontSize: 13.sp, color: AppColors.textSecondary)),
+              icon: isLoading
+                  ? SizedBox(
+                      width: 14.r,
+                      height: 14.r,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
+                  : Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary, size: 20.sp),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -299,19 +407,6 @@ class LeadDetailsScreen extends GetView<LeadDetailsController> {
         return const DocumentsTabView(key: ValueKey('docs_tab'));
       default:
         return const SizedBox.shrink();
-    }
-  }
-
-  Color _getTemperatureColor(LeadTemperature temperature) {
-    switch (temperature) {
-      case LeadTemperature.hot:
-        return AppColors.error;
-      case LeadTemperature.warm:
-        return const Color(0xFFB98A1E);
-      case LeadTemperature.cold:
-        return AppColors.textSecondary;
-      case LeadTemperature.newLead:
-        return AppColors.primary;
     }
   }
 }

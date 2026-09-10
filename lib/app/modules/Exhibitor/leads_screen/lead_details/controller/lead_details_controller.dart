@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import '../../../../../data/models/lead.dart';
 import '../../../../../data/repositories/lead_repository.dart';
 import '../../../../../data/services/endpoints.dart';
+import '../../../dashboard/controller/dashBoard_controller.dart';
+import '../../lead_pipeline/controller/lead_pipeline_controller.dart';
 
 class LeadNote {
   final int id;
@@ -119,6 +121,38 @@ class LeadDocument {
   }
 }
 
+class LeadStatus {
+  final int id;
+  final String name;
+  final String slug;
+
+  LeadStatus({required this.id, required this.name, required this.slug});
+
+  factory LeadStatus.fromJson(Map<String, dynamic> json) {
+    return LeadStatus(
+      id: json['id'],
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+    );
+  }
+}
+
+class SalesPerson {
+  final int id;
+  final String name;
+  final String userType;
+
+  SalesPerson({required this.id, required this.name, required this.userType});
+
+  factory SalesPerson.fromJson(Map<String, dynamic> json) {
+    return SalesPerson(
+      id: json['id'],
+      name: json['name'] ?? '',
+      userType: json['user_type'] ?? '',
+    );
+  }
+}
+
 class LeadDetailsController extends GetxController {
   final LeadRepository _leadRepository = LeadRepository();
 
@@ -158,11 +192,20 @@ class LeadDetailsController extends GetxController {
   final isUploadingDocument = false.obs;
   final isDeletingDocument = 0.obs;
 
+  // Status and Sales Person
+  final leadStatuses = <LeadStatus>[].obs;
+  final salesPersons = <SalesPerson>[].obs;
+  final selectedStatusId = RxnInt();
+  final selectedSalesPersonId = RxnInt();
+  final isUpdatingStatus = false.obs;
+  final isAssigningSalesPerson = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     lead = Get.arguments as Lead;
     fetchLeadDetails();
+    fetchDropdownData();
   }
 
   Future<void> fetchLeadDetails() async {
@@ -178,9 +221,19 @@ class LeadDetailsController extends GetxController {
           whatsapp: data['whatsapp'],
           title: data['designation'],
           company: data['company_name'],
+          status_name: data['status_name'],
+          status_color: data['status_color'],
         );
         detailedLead.value = updatedLead;
         lead = updatedLead;
+
+        // Initialize current status and assigned person based on the provided JSON structure
+        if (data['status'] != null) {
+          selectedStatusId.value = int.tryParse(data['status'].toString());
+        }
+        if (data['assigned_to'] != null && data['assigned_to'] is Map) {
+          selectedSalesPersonId.value = int.tryParse(data['assigned_to']['id'].toString());
+        }
 
         if (data['notes'] != null && data['notes'] is List) {
           notes.assignAll((data['notes'] as List).map((n) => LeadNote.fromJson(n)).toList());
@@ -206,6 +259,57 @@ class LeadDetailsController extends GetxController {
       Get.snackbar("Error", result.error?.message ?? "Failed to fetch lead details");
     }
     isLoading.value = false;
+  }
+
+  Future<void> fetchDropdownData() async {
+    final statusResult = await _leadRepository.getLeadStatuses();
+    if (statusResult.success && statusResult.data?['data'] != null) {
+      leadStatuses.assignAll((statusResult.data!['data'] as List).map((s) => LeadStatus.fromJson(s)).toList());
+    }
+
+    final salesResult = await _leadRepository.getSalesPersons();
+    if (salesResult.success && salesResult.data?['data'] != null) {
+      salesPersons.assignAll((salesResult.data!['data'] as List).map((s) => SalesPerson.fromJson(s)).toList());
+    }
+  }
+
+  Future<void> updateStatus(int? statusId) async {
+    if (statusId == null) return;
+    isUpdatingStatus.value = true;
+    final result = await _leadRepository.updateLeadStatus(lead.id, statusId);
+    if (result.success) {
+      selectedStatusId.value = statusId;
+      await fetchLeadDetails(); // Refresh to get new status_name and status_color
+      _refreshOtherScreens();
+      Get.snackbar("Success", "Lead status updated successfully");
+    } else {
+      Get.snackbar("Error", result.error?.message ?? "Failed to update status");
+    }
+    isUpdatingStatus.value = false;
+  }
+
+  Future<void> assignSalesPerson(int? salesPersonId) async {
+    if (salesPersonId == null) return;
+    isAssigningSalesPerson.value = true;
+    final result = await _leadRepository.assignSalesPerson(lead.id, salesPersonId);
+    if (result.success) {
+      selectedSalesPersonId.value = salesPersonId;
+      await fetchLeadDetails();
+      _refreshOtherScreens();
+      Get.snackbar("Success", "Sales person assigned successfully");
+    } else {
+      Get.snackbar("Error", result.error?.message ?? "Failed to assign sales person");
+    }
+    isAssigningSalesPerson.value = false;
+  }
+
+  void _refreshOtherScreens() {
+    if (Get.isRegistered<DashboardController>()) {
+      Get.find<DashboardController>().loadDashboard();
+    }
+    if (Get.isRegistered<LeadPipelineController>()) {
+      Get.find<LeadPipelineController>().fetchLeads();
+    }
   }
 
   // Document Methods
